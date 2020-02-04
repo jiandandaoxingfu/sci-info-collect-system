@@ -1,7 +1,15 @@
-/*
-* @Author:             old jia
-* @Email:              jiaminxin@outlook.com
-* @Date:               2020-02-03 11:39:03
-* @Last Modified by:   old jia
-* @Last Modified time: 2020-02-03 14:12:31
-*/
+// chrome.tabs.query({
+// 	active: true,
+// 	currentWindow: true
+// }, function(tabs) {
+// 	chrome.tabs.sendMessage(tabs[0].id, {
+// 		from: 'background',
+// 		to: 'content_scripts'
+// 	}, function(response) {
+// 		console.log(response);
+// 	});
+// });
+
+chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
+
+})
