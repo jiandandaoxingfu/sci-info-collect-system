@@ -1,0 +1,46 @@
+{
+  "name": "科研成果统计",
+  "manifest_version": 2,
+  "version": "1.0.0",
+  "icons": {
+    "16": "img/icon.png",
+    "32": "img/icon.png",
+    "48": "img/icon.png",
+    "64": "img/icon.png"
+  },
+
+  "description": "用于科研成果统计",
+  "permissions": [
+    "tabs",
+    "storage",
+    "contextMenus",
+    "webRequest",
+    "webRequestBlocking",
+    "activeTab",
+    "https://*/*",
+    "http://*/*"
+  ],
+
+  "browser_action": {
+    "default_popup": "html/popup.html",
+    "default_icon": {
+      "16": "img/icon.png",
+      "32": "img/icon.png",
+      "48": "img/icon.png",
+      "64": "img/icon.png"
+    }
+  },
+
+  "background": {
+    "js": "js/background.js",
+    "president": false
+  },
+
+  "content_scripts": [{
+    "matches": ["http://*/*", "https://*/*"],
+    "js": ["lib/html2canvas.min.js", "lib/jspdf.min.js", "js/html2pdf.js"]
+  }],
+
+  "author": "JMx",
+  "homepage_url": "http://github.com/jiandandaoxingfu/chrome-extension"
+}

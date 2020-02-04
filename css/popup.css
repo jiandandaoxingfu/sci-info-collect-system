@@ -1,0 +1,9 @@
+body {
+  font-family: Roboto, 'Segoe UI',Arial,'Microsoft Yahei',sans-serif;
+}
+
+#box{
+  padding: 5px;
+  width: 255px;
+  height:130px;
+}

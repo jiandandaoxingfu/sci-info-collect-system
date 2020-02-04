@@ -1,0 +1,161 @@
+html, body, #app, .container {
+  height: 100%;
+}
+
+body {
+/* font-family: "Merriweather", Georgia, serif; */
+/* font-family: soleil, Raleway, sans-serif; */
+  font-family: 'lora';
+  width: 100%;
+  margin: 0 auto;
+  background: url(/img/bg/bg_demo.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow-x: hidden;
+}
+
+/* 高斯模糊效果 */
+/* -webkit-filter: blur(5px);
+-moz-filter: blur(5px);
+-ms-filter: blur(5px);
+filter: blur(5px); */
+
+.easy-input {
+  display: inline-block;
+  outline: none;
+  border: 0;
+  text-align: center;
+  background: transparent;
+  border-bottom: 2px solid #00000094;
+}
+
+.easy-input::placeholder {
+  color: #00000059;
+}
+
+.div-btn {
+  outline: none;
+  border: 0px;
+  background: transparent;
+}
+
+.light {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: #fffffff2;
+}
+
+.surrounding {
+  position: relative;
+  top: 252px;
+  height: 200px;
+  text-align: center;
+  margin: 0 190px;
+}
+
+.full-blur {
+  /* display: none; */
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  margin: 0 auto;
+
+  background-image: url(/img/bg/bg_demo.png);
+  background-repeat: no-repeat;
+  background-size: cover;
+  overflow-x: hidden;
+
+  /* 设置柔光 */
+  opacity: 0.5;
+
+  -webkit-filter: blur(20px);
+  -moz-filter: blur(20px);
+  -ms-filter: blur(20px);
+  filter: blur(20px);
+}
+/*
+.blur {
+  position: absolute;
+  left: 350px;
+  top: 247px;
+  width: 760px;
+  height: 200px;
+} */
+
+.search-div {
+  position: relative;
+  top: 68px;
+}
+
+.search-div .search-input {
+  width: 380px;
+  height: 32px;
+  margin: 10px 12px;
+  padding: 0px 10px;
+  font-size: 19px;
+  font-weight: 300;
+}
+
+.search-div .search-btn {
+  position: relative;
+  top: 6px;
+  color: #00000082;
+  -webkit-transition: color .35s;
+  -o-transition: color .35s;
+  transition: color .35s;
+}
+
+.search-div .search-btn:hover {
+  color: #ffffff82;
+}
+
+.slide-bar {
+  width: 245px;
+  height: 50px;
+  padding: 20px;
+  position: fixed;
+  right: 20px;
+  bottom: 16px;
+}
+
+.slide-bar:hover .slider {
+  background: #b6b6b669;
+}
+
+.slide-bar:hover .slider::-webkit-slider-thumb {
+  background: #2626266e;
+}
+
+/* 滑动条的样式 */
+input[type=range] {
+    -webkit-appearance: none;
+    width: 200px;
+    height: 6px;
+    border-radius: 10px; /*这个属性设置使填充进度条时的图形为圆角*/
+    transition: background 1.2s;
+    background: transparent;
+}
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    height: 15px;
+    border-radius: 200px; /*将轨道设为圆角的*/
+    /* box-shadow: 0 1px 1px #def3f8, inset 0 .125em .125em #0d1112; /*轨道内置阴影效果*/ */
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 17px;
+    width: 17px;
+    margin-top: -2px; /*使滑块超出轨道部分的偏移量相等*/
+    border-radius: 50%; /*外观设置为圆形*/
+    /* border: solid 0.125em rgba(205, 224, 230, 0.5); /*设置边框*/ */
+    /* box-shadow: 0 .125em .125em #3b4547; /*添加底部阴影*/ */
+}
