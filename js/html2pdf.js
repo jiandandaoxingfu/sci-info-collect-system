@@ -38,5 +38,6 @@ function html2pdf(title, msg) {
 		}
 		pdf.save(title + '.pdf');
 		message.send('printed', {msg: msg});
+		window.close();
 	});
 }

@@ -65,7 +65,7 @@ class App {
 
 	restart() {
 		
-	// }
+	}
 
 	// update_and_load(data, message) {
 	// 	this.setState({
@@ -168,11 +168,10 @@ document.addEventListener('click', (e) => {
 	if( e.target.tagName.toLowerCase() === 'button' ) {
 		let action = e.target.innerText;
 		if( action === "开始统计" ) {
-
-		if( app.input_valid_check() ) {
-			app.render();
-			app.start();
-		}
+			if( app.input_valid_check() ) {
+				app.render();
+				app.start();
+			}
 		} else if( action === "重新启动" ) {
 			app.restart();
 		}

@@ -14,7 +14,15 @@ function get_parameter() {
 	if( !paper.title ) {
 		if( title ) paper.title = title[1];
 		if( id ) paper.id = id[1];
-		if( author ) paper.author = author[1];
+		if( author ) {
+			let s = author[1];
+			let s2 = s.split('-');
+			if( s2.length === 3 ) {
+				paper.author = [s.replace(/-/g, ''), s2[0]+s2[1]+s2[2].toLocaleLowerCase(), s2[1]+s2[2]+s2[0], s2[1]+s2[2].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0]+s2[2][0], s2[0]+s2[1][0]+s2[2][0].toLocaleLowerCase(), s2[1][0]+s2[2][0]+s2[0], s2[1][0]+s2[2][0].toLocaleLowerCase()+ s2[0] ];
+			} else if( s2.length === 2 ) {
+				paper.author = [s.replace(/-/g, ''), s2[0]+s2[1].toLocaleLowerCase(), s2[1]+s2[0], s2[1].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0], s2[0]+s2[1][0].toLocaleLowerCase(), s2[1][0]+s2[0], s2[1][0].toLocaleLowerCase()+ s2[0] ];
+			}
+		}
 	}
 };
 
