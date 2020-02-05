@@ -2,7 +2,7 @@
 Ref: https://www.cnblogs.com/N1ckeyQu/p/11382195.html.
 */
 
-function html2pdf(title) {
+function html2pdf(title, msg) {
 	html2canvas(document.body).then(function(canvas) {
 		var contentWidth = canvas.width;
 		var contentHeight = canvas.height;
@@ -37,5 +37,6 @@ function html2pdf(title) {
 			}
 		}
 		pdf.save(title + '.pdf');
+		message.send('printed', {msg: msg});
 	});
 }
