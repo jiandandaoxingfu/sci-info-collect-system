@@ -2,6 +2,8 @@
   "name": "科研成果统计",
   "manifest_version": 2,
   "version": "1.0.0",
+  "author": "JMx",
+  "homepage_url": "http://github.com/jiandandaoxingfu/chrome-extension",
   "icons": {
     "16": "img/icon.png",
     "32": "img/icon.png",
@@ -17,8 +19,7 @@
     "webRequest",
     "webRequestBlocking",
     "activeTab",
-    "https://*/*",
-    "http://*/*"
+    "<all_urls>"
   ],
 
   "browser_action": {
@@ -32,15 +33,12 @@
   },
 
   "background": {
-    "js": "js/background.js",
+    "page": "html/background.html",
     "president": false
   },
 
   "content_scripts": [{
-    "matches": ["http://*/*", "https://*/*"],
-    "js": ["lib/html2canvas.min.js", "lib/jspdf.min.js", "js/html2pdf.js"]
-  }],
-
-  "author": "JMx",
-  "homepage_url": "http://github.com/jiandandaoxingfu/chrome-extension"
+    "matches": ["<all_urls>"],
+    "js": ["lib/html2canvas.min.js", "lib/jspdf.min.js", "js/html2pdf.js", "js/content.js"]
+  }]
 }

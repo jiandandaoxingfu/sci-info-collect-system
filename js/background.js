@@ -1,15 +1,12 @@
-// chrome.tabs.query({
-// 	active: true,
-// 	currentWindow: true
-// }, function(tabs) {
-// 	chrome.tabs.sendMessage(tabs[0].id, {
-// 		from: 'background',
-// 		to: 'content_scripts'
-// 	}, function(response) {
-// 		console.log(response);
-// 	});
-// });
-
-chrome.runtime.onMessage.addListener((req, sender, sendRes) => {
-
+var appId;
+chrome.runtime.onMessage.addListener( (req, sender, sendRes) => {
+	sendRes('已接收消息')
+	if( req.msg === 'app' ) {
+		appId = sender.tab.id;
+	} else {
+		if( appId ) {
+			chrome.tabs.sendMessage(appId, {msg: '前端反馈'});
+		}
+	}
+	console.log(appId)
 })
