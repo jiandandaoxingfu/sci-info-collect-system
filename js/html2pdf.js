@@ -4,7 +4,7 @@ Ref: https://www.cnblogs.com/N1ckeyQu/p/11382195.html.
 
 function html2pdf(title, msg) {
 	return html2canvas( document.body, {
-		scale: 4,
+		scale: 1,
 	} ).then( (canvas) => {
 		var contentWidth = canvas.width;
 		var contentHeight = canvas.height;

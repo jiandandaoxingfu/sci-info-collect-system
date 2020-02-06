@@ -74,11 +74,13 @@ class Paper {
 			self_cite_num: self_cite_num,
 			other_cite_num: other_cite_num,
 		});
+		this.print_better_cite_page();
 		html2pdf(this.id + '-被引论文列表-' + this.title, "cite_printed");
 	}
 
 	detail_page() {
 		window.stop();
+		this.print_better_detail_page();
 		html2pdf(this.id + '-详情页-' + this.title, "detail_printed").then(() => {
 			message.send('close-window', {msg: ''});	
 		});
@@ -94,6 +96,59 @@ class Paper {
     	document.body.appendChild(dlLink);
     	dlLink.click();
     	document.body.removeChild(dlLink);
+	}
+
+	print_better_cite_page() {
+		let body = document.body;
+		let title = body.querySelector('.block-text');
+		body.querySelector('.block-text-content').setAttribute('style', 'padding: 20px')
+		let print = body.querySelector(".l-column-content");
+		body.innerHTML = title.innerHTML + print.innerHTML;
+		body.querySelector('#naturalLimited').setAttribute('class', 'naturalOff');
+		for(let e of body.getElementsByClassName("nodisplay") ) { e.parentElement.removeChild(e) }
+		for(let e of body.getElementsByClassName("hidden") ) { e.parentElement.removeChild(e) }
+		[	body.querySelectorAll('*[style="display: none"]'),
+			body.querySelectorAll('*[style="visibility: hidden"]'),
+			body.querySelectorAll('script'),
+			body.querySelectorAll('*[type="hidden"]'),
+			body.querySelectorAll('.paginationBar'),
+			body.querySelectorAll('.create-cite-report'),
+			body.querySelectorAll('.search-results-checkbox'),
+			body.querySelectorAll('.alum'),
+		].filter( e => e.length > 0 )
+	 	.forEach( eles => eles.forEach( e => e.parentElement.removeChild(e) ) );
+	
+		[	body.querySelector('#CitationScoreCard'),
+			body.querySelector('#results_summary_label'),
+			body.querySelector('#summaryRecordsTable').lastElementChild,
+			body.querySelector('#markedListButton').parentElement,
+			body.querySelector('#summary_daisy_top_chunk'),
+			body.querySelector('#mark_records_form'),
+			body.querySelector('#records_chunks').firstElementChild,
+			body.querySelector('.recordMatchBar'),
+			body.querySelector('#trueFinalResultCount'),
+		].filter( e => e.length !== null )
+	 	.forEach( e => e.parentElement.removeChild(e));
+	
+		body.querySelectorAll('.search-results-content').forEach( e => {
+		 	[1, 2, 3, 4, 5].forEach( () => e.removeChild(e.children[3]) );
+		})	
+	
+		body.querySelectorAll('.search-results-number').forEach( e => e.innerHTML = e.innerText );
+		body.querySelectorAll('*[href]').forEach( e => e.removeAttribute('href') );
+		body.querySelectorAll('*[onclick]').forEach( e => e.removeAttribute('onclick') );
+		body.querySelectorAll('div').forEach( e => e.style.backgroundColor = 'white');
+		body.querySelectorAll('.search-results-content').forEach( e => e.children[0].style.width = '800px' );
+	}
+
+	print_better_detail_page() {
+		let body = document.body;
+		body.querySelectorAll('*[type="hidden"]').forEach( e => e.parentElement.removeChild(e) );
+		let table = document.getElementById('printForm').children[3];
+		body.innerHTML = '';
+		body.appendChild(table);
+		body.width = '900px';
+		table.width = '900px';
 	}
 }
 
