@@ -1,12 +1,11 @@
 class Paper {
-	constructor() {
-		this.id = 0;
-		this.author = '';
-		this.author_arr = [];
-		this.title = '';
-		this.qid = '';
-		this.sid = '';
-		this.tabId = 0;
+	init(msg) {
+		this.id = msg.id;
+		this.author = msg.author;
+		this.author_arr = format_name(msg.author);
+		this.title = msg.title;
+		this.qid = msg.qid;
+		this.sid = msg.sid;
 	}
 
 	search_page() {
@@ -22,8 +21,11 @@ class Paper {
 			message.send("search_page_info", { info: 'no_found' });
 		} else if( len === 1 && cite_item ){
 			let search_item = document.getElementById('RECORD_1');
+			search_item.innerHTML = search_item.innerHTML.replace(/(src|href|url)=".*?"/g, '');
 			window.stop();
+			console.log(new Date().getSeconds() + '开始截图');
 			html2canvas(search_item).then( canvas => {
+				console.log(new Date().getSeconds() + '开始保存');
 				this.save_element2image(canvas);
 				message.send("search_page_info", { info: 'captured' });
 				document.querySelector('a.snowplow-times-cited-link').click();
@@ -42,6 +44,7 @@ class Paper {
 					let url = `https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com/OutboundService.do?action=go&displayCitedRefs=true&displayTimesCited=true&displayUsageInfo=true&viewType=summary&product=WOS&mark_id=WOS&colName=WOS&search_mode=GeneralSearch&locale=zh_CN&view_name=WOS-summary&sortBy=PY.D%3BLD.D%3BSO.A%3BVL.D%3BPG.A%3BAU.A&mode=outputService&qid=${this.qid}&SID=${this.sid}&format=formatForPrint&filters=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&selectedIds=1&mark_to=1&mark_from=1&queryNatural=${this.title}&count_new_items_marked=0&MaxDataSetLimit=&use_two_ets=false&DataSetsRemaining=&IsAtMaxLimit=&IncitesEntitled=yes&value(record_select_type)=pagerecords&markFrom=1&markTo=1&fields_selection=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&&&totalMarked=1`;
 					console.log(url);
 					message.send('open_detail_page', {url: url});
+					window.stop();
 					input.click();
 					document.getElementById('PublicationYear_tr').querySelector('button[alt="精炼"]').click();
 				}
@@ -72,24 +75,36 @@ class Paper {
 			self_cite_num: self_cite_num,
 			other_cite_num: other_cite_num,
 		});
-		html2pdf(this.title, "cite_printed");
-		chrome.tabs.remove(this.tabId)
+		html2pdf(this.id + '-被引论文列表-' + this.title, "cite_printed");
 	}
 
 	detail_page() {
-		html2pdf(this.title, "detail_printed");
-		chrome.tabs.remove(this.tabId)
+		html2pdf(this.id + '-详情页-' + this.title, "detail_printed").then(() => {
+			message.send('close-window', {msg: ''});	
+		});
 	}
 
 	save_element2image(canvas) {
     	let MIME_TYPE = "image/png";
     	let imgURL = canvas.toDataURL(MIME_TYPE);
     	let dlLink = document.createElement('a');
-    	dlLink.download = this.title + '.png';
+    	dlLink.download = this.id + '-截图-' + this.title + '.png';
     	dlLink.href = imgURL;
     	dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
     	document.body.appendChild(dlLink);
     	dlLink.click();
     	document.body.removeChild(dlLink);
+    	console.log(new Date().getSeconds() + '已保存');
 	}
+}
+
+
+function format_name(s) {
+	let s2 = s.split('-');
+	if( s2.length === 3 ) {
+		name_arr = [s.replace(/-/g, ''), s2[0]+s2[1]+s2[2].toLocaleLowerCase(), s2[1]+s2[2]+s2[0], s2[1]+s2[2].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0]+s2[2][0], s2[0]+s2[1][0]+s2[2][0].toLocaleLowerCase(), s2[1][0]+s2[2][0]+s2[0], s2[1][0]+s2[2][0].toLocaleLowerCase()+ s2[0] ];
+	} else if( s2.length === 2 ) {
+		name_arr = [s.replace(/-/g, ''), s2[0]+s2[1].toLocaleLowerCase(), s2[1]+s2[0], s2[1].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0], s2[0]+s2[1][0].toLocaleLowerCase(), s2[1][0]+s2[0], s2[1][0].toLocaleLowerCase()+ s2[0] ];
+	}
+	return name_arr;
 }

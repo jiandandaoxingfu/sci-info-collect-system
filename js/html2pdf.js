@@ -3,7 +3,9 @@ Ref: https://www.cnblogs.com/N1ckeyQu/p/11382195.html.
 */
 
 function html2pdf(title, msg) {
-	html2canvas(document.body).then(function(canvas) {
+	let body = document.body;
+	body.innerHTML = body.innerHTML.replace(/(src|href|url)=".*?"/g, '');
+	return html2canvas(body, {scale: 2}).then( (canvas) => {
 		var contentWidth = canvas.width;
 		var contentHeight = canvas.height;
 
