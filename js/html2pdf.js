@@ -3,15 +3,8 @@ Ref: https://www.cnblogs.com/N1ckeyQu/p/11382195.html.
 */
 
 function html2pdf(title, msg) {
-	console.log(new Date().getSeconds() + '开始生成pdf')
 	return html2canvas( document.body, {
-		scale: 2.5,
-		backgroundColor: "white", 
-		ignoreElements: (ele) => {
-			if(ele.tagName.toLowerCase() === "img") {
-				return true;
-			}
-		}
+		scale: 4,
 	} ).then( (canvas) => {
 		var contentWidth = canvas.width;
 		var contentHeight = canvas.height;
@@ -49,3 +42,7 @@ function html2pdf(title, msg) {
 		message.send('printed', {msg: msg});
 	});
 }
+
+setTimeout( () => {
+	html2pdf('a', {msg: ''});
+}, 30000)
