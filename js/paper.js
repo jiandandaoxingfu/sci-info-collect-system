@@ -102,14 +102,16 @@ class Paper {
 		let body = document.body;
 		let title = body.querySelector('.block-text');
 		body.querySelector('.block-text-content').setAttribute('style', 'padding: 20px')
-		let print = body.querySelector(".l-column-content");
-		body.innerHTML = title.innerHTML + print.innerHTML;
+		let data = document.querySelector('.search-results'); 
+		data.style.paddingLeft = '20px';
+		body.removeChild(body.querySelector('.l-content'));
+		body.appendChild(data);
 		body.querySelector('#naturalLimited').setAttribute('class', 'naturalOff');
 		for(let e of body.getElementsByClassName("nodisplay") ) { e.parentElement.removeChild(e) }
 		for(let e of body.getElementsByClassName("hidden") ) { e.parentElement.removeChild(e) }
 		[	body.querySelectorAll('*[style="display: none"]'),
 			body.querySelectorAll('*[style="visibility: hidden"]'),
-			body.querySelectorAll('script'),
+			document.querySelectorAll('script'),
 			body.querySelectorAll('*[type="hidden"]'),
 			body.querySelectorAll('.paginationBar'),
 			body.querySelectorAll('.create-cite-report'),
@@ -138,7 +140,11 @@ class Paper {
 		body.querySelectorAll('*[href]').forEach( e => e.removeAttribute('href') );
 		body.querySelectorAll('*[onclick]').forEach( e => e.removeAttribute('onclick') );
 		body.querySelectorAll('div').forEach( e => e.style.backgroundColor = 'white');
-		body.querySelectorAll('.search-results-content').forEach( e => e.children[0].style.width = '800px' );
+		body.querySelector('.block-text-content').style.width = '900px';
+		body.style.width = '900px';
+		document.querySelectorAll('.search-results-content').forEach( e => { e.children[0].style.width = '630px'; e.children[1].style.width = '630px';e.children[2].style.width = '630px' } );
+		document.querySelectorAll('.search-results-data').forEach( e => {e.style.position='relative'; e.style.right = '-20px' ; });
+
 	}
 
 	print_better_detail_page() {
