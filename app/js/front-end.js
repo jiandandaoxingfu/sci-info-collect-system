@@ -48,7 +48,7 @@ class App {
 		})
 
 		message.on('close-window', (msg) => {
-			chrome.tabs.remove(this.detail_win_id);
+			// chrome.tabs.remove(this.detail_win_id);
 		})
 	}
 

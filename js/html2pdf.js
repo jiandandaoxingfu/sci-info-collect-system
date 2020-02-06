@@ -4,11 +4,15 @@ Ref: https://www.cnblogs.com/N1ckeyQu/p/11382195.html.
 
 function html2pdf(title, msg) {
 	console.log(new Date().getSeconds() + '开始生成pdf')
-	return html2canvas( document.body, {scale: 2, imageTimeout: 0, backgroundColor: "white", ignoreElements: (ele) => {
-		if(ele.tagName.toLowerCase() === "img") {
-			return true;
+	return html2canvas( document.body, {
+		scale: 2.5,
+		backgroundColor: "white", 
+		ignoreElements: (ele) => {
+			if(ele.tagName.toLowerCase() === "img") {
+				return true;
+			}
 		}
-	}} ).then( (canvas) => {
+	} ).then( (canvas) => {
 		var contentWidth = canvas.width;
 		var contentHeight = canvas.height;
 
@@ -41,8 +45,7 @@ function html2pdf(title, msg) {
 				}
 			}
 		}
-		pdf.output("save", title + '.pdf');
-		console.log(new Date().getSeconds() + '已经生成pdf');
+		pdf.save(title + '.pdf');
 		message.send('printed', {msg: msg});
 	});
 }
