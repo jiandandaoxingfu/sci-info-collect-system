@@ -3,7 +3,12 @@ Ref: https://www.cnblogs.com/N1ckeyQu/p/11382195.html.
 */
 
 function html2pdf(title, msg) {
-	return html2canvas( document.body, {scale: 2, imageTimeout: 0} ).then( (canvas) => {
+	console.log(new Date().getSeconds() + '开始生成pdf')
+	return html2canvas( document.body, {scale: 2, imageTimeout: 0, backgroundColor: "white", ignoreElements: (ele) => {
+		if(ele.tagName.toLowerCase() === "img") {
+			return true;
+		}
+	}} ).then( (canvas) => {
 		var contentWidth = canvas.width;
 		var contentHeight = canvas.height;
 
@@ -36,7 +41,8 @@ function html2pdf(title, msg) {
 				}
 			}
 		}
-		pdf.save(title + '.pdf');
+		pdf.output("save", title + '.pdf');
+		console.log(new Date().getSeconds() + '已经生成pdf');
 		message.send('printed', {msg: msg});
 	});
 }

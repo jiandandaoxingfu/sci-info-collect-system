@@ -39,7 +39,7 @@
 
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": ["lib/html2canvas.min.js", "lib/jspdf.min.js", "js/html2pdf.js", "js/message.js", "js/paper.js", "js/content.js"],
+    "js": ["lib/jspdf.min.js", "lib/html2canvas.min.js", "js/html2pdf.js", "js/message.js", "js/paper.js", "js/content.js"],
     "run_at": "document_start"
   }]
 }
