@@ -9,6 +9,7 @@ class Paper {
 	}
 
 	search_page() {
+		window.stop();
 		let qid = document.body.innerHTML.match(/qid=(\d+)/) || [0, 0];
 		message.send('qid', {qid: qid[1]});
 		let len = document.querySelectorAll('div.search-results-item').length;
@@ -21,19 +22,19 @@ class Paper {
 			message.send("search_page_info", { info: 'no_found' });
 		} else if( len === 1 && cite_item ){
 			let search_item = document.getElementById('RECORD_1');
+			let href = document.querySelector('a.snowplow-times-cited-link').getAttribute('href');
 			search_item.innerHTML = search_item.innerHTML.replace(/(src|href|url)=".*?"/g, '');
-			window.stop();
-			console.log(new Date().getSeconds() + '开始截图');
 			html2canvas(search_item).then( canvas => {
-				console.log(new Date().getSeconds() + '开始保存');
 				this.save_element2image(canvas);
 				message.send("search_page_info", { info: 'captured' });
+				document.querySelector('a.snowplow-times-cited-link').setAttribute('href', href);
 				document.querySelector('a.snowplow-times-cited-link').click();
 			});
 		}
 	}	
 
 	cite_page() {
+		window.stop();
 		let has_2018 = document.getElementById('PublicationYear_tr').innerHTML.includes('PublicationYear_2018');
 		let info = 'no_cite';
 		if( has_2018 ) {
@@ -42,9 +43,7 @@ class Paper {
 				if( input.value.includes("2018") ) {
 					info = input.nextElementSibling.innerHTML.match(/\((\d+)\)/)[1];
 					let url = `https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com/OutboundService.do?action=go&displayCitedRefs=true&displayTimesCited=true&displayUsageInfo=true&viewType=summary&product=WOS&mark_id=WOS&colName=WOS&search_mode=GeneralSearch&locale=zh_CN&view_name=WOS-summary&sortBy=PY.D%3BLD.D%3BSO.A%3BVL.D%3BPG.A%3BAU.A&mode=outputService&qid=${this.qid}&SID=${this.sid}&format=formatForPrint&filters=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&selectedIds=1&mark_to=1&mark_from=1&queryNatural=${this.title}&count_new_items_marked=0&MaxDataSetLimit=&use_two_ets=false&DataSetsRemaining=&IsAtMaxLimit=&IncitesEntitled=yes&value(record_select_type)=pagerecords&markFrom=1&markTo=1&fields_selection=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&&&totalMarked=1`;
-					console.log(url);
 					message.send('open_detail_page', {url: url});
-					window.stop();
 					input.click();
 					document.getElementById('PublicationYear_tr').querySelector('button[alt="精炼"]').click();
 				}
@@ -54,6 +53,7 @@ class Paper {
 	}
 
 	cite_refined_page() {
+		window.stop();
 		let self_cite_num = 0, other_cite_num = 0;
 		for( let div of document.querySelectorAll('div.search-results-item') ) {
 			let authors = [];
@@ -70,7 +70,6 @@ class Paper {
 				self_cite_num += 1;
 			}
 		}
-		window.stop();
 		message.send("cite_num", {
 			self_cite_num: self_cite_num,
 			other_cite_num: other_cite_num,
@@ -79,6 +78,7 @@ class Paper {
 	}
 
 	detail_page() {
+		window.stop();
 		html2pdf(this.id + '-详情页-' + this.title, "detail_printed").then(() => {
 			message.send('close-window', {msg: ''});	
 		});
@@ -94,7 +94,6 @@ class Paper {
     	document.body.appendChild(dlLink);
     	dlLink.click();
     	document.body.removeChild(dlLink);
-    	console.log(new Date().getSeconds() + '已保存');
 	}
 }
 
