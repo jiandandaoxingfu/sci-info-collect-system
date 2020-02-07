@@ -1,6 +1,6 @@
 class Message {
-	send(title, msg) {
-		chrome.runtime.sendMessage({title: title, msg: msg});
+	send(tabid, title, msg) {
+		chrome.tabs.sendMessage(tabid, {title: title, msg: msg});
 	}
 
 	on(title, callback) {
