@@ -65,6 +65,14 @@ class App {
 			}
 		})
 
+		message.on('spider', msg => {
+			this.spider = msg.spider;
+		})
+
+		message.on('get-spider', (msg, tabid) => {
+			message.send(tabid, 'spider', {spider: this.spider});
+		})
+
 		message.on('open-cite-page', msg => {
 			chrome.tabs.create({
 				active: false,
@@ -74,8 +82,8 @@ class App {
 			})
 		})
 
-		message.on('cite-refine-data', (msg, tabid) => {
-			message.send('data-id', {id: this.cite_tabs_id.indexOf(tabid)})
+		message.on('get-id', (msg, tabid) => {
+			message.send(tabid, 'get-id', {id: this.cite_tabs_id.indexOf(tabid)})
 		});
 
 		message.on("no-cite-refine-data", (msg, tabid) => {
@@ -84,30 +92,12 @@ class App {
 			}
 		});
 
-		message.on('cite-refine-data', (msg, tabid) => {
-			chrome.tabs.remove(tabid);
-			message.send('data-id', {id: this.cite_tabs_id.indexOf(tabid)})
-		} );
-
-		message.on('cite-refine-data-done', (msg, tabid) => {
+		message.on('cite-refine-done', (msg, tabid) => {
 			if(msg.info) {
 				chrome.tabs.remove(tabid);
 			}
 		});
 
-		// message.on("open_detail_page", (msg) => {
-		// 	chrome.tabs.create({
-		// 		active: false,
-		// 		url: msg.url
-		// 	}, (tab) => {
-		// 		this.detail_tabs_id = tab.id;
-		// 	})
-		// })
-
-		message.on('close-window', (msg) => {
-			this.is_start = false;
-			// chrome.tabs.remove(this.detail_tab_id);
-		})
 	}
 }
 

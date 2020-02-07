@@ -13,6 +13,7 @@ class Spider {
 	get_title_arr() {
 		message.on('title-arr', msg => {
 			this.init(msg.title_arr);
+			message.send('spider', {spider: this});
 			this.run();
 		})
 	}
@@ -63,9 +64,9 @@ class Spider {
 	}
 
 	get_detail_data() {
-		this.detail_url = this.detail_url.replace('_qid_', this.qid_arr[id])
-			.replace('_title_', this.title_arr[id]);
-		message.on('data-id', msg => {
+		message.on('get-id', msg => {
+			this.detail_url = this.detail_url.replace('_qid_', this.qid_arr[id])
+				.replace('_title_', this.title_arr[id]);
 			return axios.get(this.detail_url).then( res => {
 				let data = res.data.replace(/(\r\n|\r|\n)/);
 				data = this.table_format(data);
@@ -78,9 +79,9 @@ class Spider {
 	get_cite_refine_data(data) {
 		data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0]
 		data = this.data_format(data);
-		message.on('data-id', msg => {
+		message.on('get-id', msg => {
 			this.cite_refine_datas[id] = data;
-			message.send('cite-refine-data-done', {info: true});
+			message.send('cite-refine-done', {info: true});
 		})			
 	}
 
@@ -94,24 +95,37 @@ class Spider {
 
 	run() {
 		this.get_search_data(0).then( () => {
-			this.open_cite_page();
+			this.open_cite_page(0);
 		})
 	}
 }
 
-var spider = new Spider();
-spider.get_sid();
-spider.get_title_arr();
 
-document.addEventListener("DOMContentLoaded", (e) => {
-	let url = window.location.href;
-	let data = document.body.innerHTML;
-	if( url.match(/CitingArticles.do\?.*?search_mode=CitingArticles/) ) {
-		window.stop();
-		spider.get_cite_data(data);
-	} else if( url.match(/Search.do\?.*?search_mode=CitingArticles/) ) {
-		window.stop();
-		message.send('cite-refine-data', {info: ''});
-		spider.get_cite_refine_data(data);
+var url = window.location.href;
+var spider;
+
+message.send('is-start', {info: ''});
+
+message.on('is-start', msg => {
+	if( url.includes('UA_GeneralSearch_input.do?') ) {
+		spider = new Spider();
+		spider.get_sid();
+		spider.get_title_arr();
+	} else {
+		message.send('get-spider', {info: ''});
+		message.on('spider', msg => {
+			spider = msg.spider;
+		})
 	}
+	document.addEventListener("DOMContentLoaded", (e) => {
+		let data = document.body.innerHTML;
+		if( url.match(/CitingArticles.do\?.*?search_mode=CitingArticles/) ) {
+			window.stop();
+			spider.get_cite_data(data);
+		} else if( url.match(/Search.do\?.*?search_mode=CitingArticles/) ) {
+			window.stop();
+			message.send('cite-refine-get-id', {info: ''});
+			spider.get_cite_refine_data(data);
+		}
+	})
 })
