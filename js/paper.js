@@ -6,12 +6,18 @@ class Paper {
 		this.title = msg.title;
 		this.qid = msg.qid;
 		this.sid = msg.sid;
+		this.refid = msg.refid;
 	}
 
 	search_page() {
 		window.stop();
-		let qid = document.body.innerHTML.match(/qid=(\d+)/) || [0, 0];
-		message.send('qid', {qid: qid[1]});
+		let qid = document.body.innerHTML.match(/qid=(\d+)/);
+		let refid = document.body.innerHTML.match(/REFID=(\d+)/);
+		if( !qid || !refid ) {
+			alert('出错了: 无法获取qid或refid');
+			return;
+		}
+		message.send( 'qid', { qid: qid[1], refid: refid[1] } );
 		let len = document.querySelectorAll('div.search-results-item').length;
 		let cite_item = document.querySelector('a.snowplow-times-cited-link');
 		if( len > 1 ) {
@@ -21,35 +27,52 @@ class Paper {
 		} else if( len === 0 ){
 			message.send("search_page_info", { info: 'no_found' });
 		} else if( len === 1 && cite_item ){
-			let search_item = document.getElementById('RECORD_1');
-			let href = document.querySelector('a.snowplow-times-cited-link').getAttribute('href');
-			search_item.innerHTML = search_item.innerHTML.replace(/(src|href|url)=".*?"/g, '');
-			html2canvas(search_item).then( canvas => {
-				this.save_element2image(canvas);
-				message.send("search_page_info", { info: 'captured' });
-				document.querySelector('a.snowplow-times-cited-link').setAttribute('href', href);
-				document.querySelector('a.snowplow-times-cited-link').click();
-			});
+			this.cite_page();
+			this.capture();
 		}
 	}	
 
-	cite_page() {
-		window.stop();
-		let has_2018 = document.getElementById('PublicationYear_tr').innerHTML.includes('PublicationYear_2018');
-		let info = 'no_cite';
-		if( has_2018 ) {
-			let inputs = document.getElementById('PublicationYear_tr').getElementsByTagName('input');
-			for( let input of inputs ) {
-				if( input.value.includes("2018") ) {
-					info = input.nextElementSibling.innerHTML.match(/\((\d+)\)/)[1];
-					let url = `https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com/OutboundService.do?action=go&displayCitedRefs=true&displayTimesCited=true&displayUsageInfo=true&viewType=summary&product=WOS&mark_id=WOS&colName=WOS&search_mode=GeneralSearch&locale=zh_CN&view_name=WOS-summary&sortBy=PY.D%3BLD.D%3BSO.A%3BVL.D%3BPG.A%3BAU.A&mode=outputService&qid=${this.qid}&SID=${this.sid}&format=formatForPrint&filters=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&selectedIds=1&mark_to=1&mark_from=1&queryNatural=${this.title}&count_new_items_marked=0&MaxDataSetLimit=&use_two_ets=false&DataSetsRemaining=&IsAtMaxLimit=&IncitesEntitled=yes&value(record_select_type)=pagerecords&markFrom=1&markTo=1&fields_selection=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&&&totalMarked=1`;
-					message.send('open_detail_page', {url: url});
-					input.click();
-					document.getElementById('PublicationYear_tr').querySelector('button[alt="精炼"]').click();
-				}
+	capture() {
+		this.capture_better_search_page();
+		console.log(new Date().getSeconds() + '开始截图')
+		html2canvas(document.body.firstChild, { scale: 2 }).then( canvas => {
+			let MIME_TYPE = "image/png";
+    		let imgURL = canvas.toDataURL(MIME_TYPE);
+    		let dlLink = document.createElement('a');
+    		dlLink.download = this.id + '-截图-' + this.title + '.png';
+    		dlLink.href = imgURL;
+    		dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
+    		document.body.appendChild(dlLink);
+    		dlLink.click();
+    		document.body.removeChild(dlLink);
+			console.log(new Date().getSeconds() + '完成截图')
+			message.send("search_page_info", { info: 'captured' });
+		});
+	}
+
+	get_cite_info() {
+		axios.get('https://vpn2.zzu.edu.cn//,DanaInfo=apps.webofknowledge.com+CitingArticles.do', {
+			product: 'WOS', 
+			SID: this.sid, 
+			search_mode: 'CitingArticles',
+			parentProduct: 'WOS',
+			parentQid: this.qid,
+			parentDoc: '1',
+			REFID: this.refid,
+			logEventUT: 'WOS:000340351500004',
+			excludeEventConfig: 'ExcludeIfFromNonInterProduct'
+		})
+		.then( res => {
+			let id = res.data.match(/.*PublicationYear_2018.*? id="(.*?)".*/)
+			if( id ) {
+				let re = new RegExp(`.*${id[1]}.*?>(.*?)<.*`);
+				let data = res.data.match(re)[1];
+				message.send("cite_page_info", {info: data.match(/\((\d+)\)/)[1]});
+				window.location.href = `https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+Search.do?product=WOS&SID=${this.sid}&search_mode=CitingArticles&prID=${this.prid}`;
+			} else {
+				message.send("cite_page_info", {info: 'no_cite'});
 			}
-		}
-		message.send("cite_page_info", {info: info});
+		})
 	}
 
 	cite_refined_page() {
@@ -63,10 +86,10 @@ class Paper {
     		}
 			let author_union = new Set( [...authors, ...this.author_arr] );
 			if( author_union.size === (authors.length + this.author_arr.length) ) {
-				div.querySelector('div.search-results-data').innerHTML += '<div class="alum" style="color: red; font-size: 18px ">他引</div>';
+				div.querySelector('div.search-results-data').innerHTML += '<div style="color: red; font-size: 15px ">他引</div>';
 				other_cite_num += 1;
 			} else {
-				div.querySelector('div.search-results-data').innerHTML += '<div class="alum" style="color: red; font-size: 18px ">自引</div>';
+				div.querySelector('div.search-results-data').innerHTML += '<div style="color: red; font-size: 15px ">自引</div>';
 				self_cite_num += 1;
 			}
 		}
@@ -75,27 +98,42 @@ class Paper {
 			other_cite_num: other_cite_num,
 		});
 		this.print_better_cite_page();
-		html2pdf(this.id + '-被引论文列表-' + this.title, "cite_printed");
+		html2pdf(this.id + '-被引论文列表-' + this.title, "cite_printed").then( () => {
+			console.log(new Date().getSeconds() + '已保存pdf')
+		});
 	}
 
 	detail_page() {
 		window.stop();
 		this.print_better_detail_page();
 		html2pdf(this.id + '-详情页-' + this.title, "detail_printed").then(() => {
+			console.log(new Date().getSeconds() + '已保存pdf')
 			message.send('close-window', {msg: ''});	
 		});
 	}
 
-	save_element2image(canvas) {
-    	let MIME_TYPE = "image/png";
-    	let imgURL = canvas.toDataURL(MIME_TYPE);
-    	let dlLink = document.createElement('a');
-    	dlLink.download = this.id + '-截图-' + this.title + '.png';
-    	dlLink.href = imgURL;
-    	dlLink.dataset.downloadurl = [MIME_TYPE, dlLink.download, dlLink.href].join(':');
-    	document.body.appendChild(dlLink);
-    	dlLink.click();
-    	document.body.removeChild(dlLink);
+	capture_better_search_page() {
+		let data = document.getElementById('RECORD_1');
+		document.body.innerHTML = '';
+		document.body.appendChild(data);
+		for(let e of data.getElementsByClassName("nodisplay") ) { e.parentElement.removeChild(e) }
+		[	data.querySelectorAll('*[style="display: none"]'),
+			document.querySelectorAll('script'),
+			data.querySelectorAll('*[type="hidden"]'),
+			data.querySelectorAll('.search-results-checkbox'),
+			data.querySelectorAll('.alum'),
+			data.querySelectorAll('.search-results-number')
+		].filter( e => e.length > 0 )
+	 	.forEach( eles => eles.forEach( e => e.parentElement.removeChild(e) ) );
+	 	
+		data.querySelectorAll('.search-results-content').forEach( e => {
+		 	[1, 2, 3, 4, 5].forEach( () => e.removeChild(e.children[3]) );
+		})	
+		
+		data.querySelectorAll('*[href]').forEach( e => e.removeAttribute('href') );
+		data.querySelectorAll('*[url]').forEach( e => e.removeAttribute('url') );
+		data.querySelectorAll('*[src]').forEach( e => e.removeAttribute('src') );	
+		data.querySelectorAll('div').forEach( e => e.style.backgroundColor = 'white');
 	}
 
 	print_better_cite_page() {
@@ -104,46 +142,32 @@ class Paper {
 		body.querySelector('.block-text-content').setAttribute('style', 'padding: 20px')
 		let data = document.querySelector('.search-results'); 
 		data.style.paddingLeft = '20px';
-		body.removeChild(body.querySelector('.l-content'));
-		body.appendChild(data);
+		body.innerHTML = '<div></div>';
+		body.firstChild.appendChild(title);
+		body.firstChild.appendChild(data);
 		body.querySelector('#naturalLimited').setAttribute('class', 'naturalOff');
 		for(let e of body.getElementsByClassName("nodisplay") ) { e.parentElement.removeChild(e) }
 		for(let e of body.getElementsByClassName("hidden") ) { e.parentElement.removeChild(e) }
 		[	body.querySelectorAll('*[style="display: none"]'),
-			body.querySelectorAll('*[style="visibility: hidden"]'),
 			document.querySelectorAll('script'),
 			body.querySelectorAll('*[type="hidden"]'),
-			body.querySelectorAll('.paginationBar'),
-			body.querySelectorAll('.create-cite-report'),
 			body.querySelectorAll('.search-results-checkbox'),
 			body.querySelectorAll('.alum'),
 		].filter( e => e.length > 0 )
 	 	.forEach( eles => eles.forEach( e => e.parentElement.removeChild(e) ) );
-	
-		[	body.querySelector('#CitationScoreCard'),
-			body.querySelector('#results_summary_label'),
-			body.querySelector('#summaryRecordsTable').lastElementChild,
-			body.querySelector('#markedListButton').parentElement,
-			body.querySelector('#summary_daisy_top_chunk'),
-			body.querySelector('#mark_records_form'),
-			body.querySelector('#records_chunks').firstElementChild,
-			body.querySelector('.recordMatchBar'),
-			body.querySelector('#trueFinalResultCount'),
-		].filter( e => e.length !== null )
-	 	.forEach( e => e.parentElement.removeChild(e));
-	
+
 		body.querySelectorAll('.search-results-content').forEach( e => {
 		 	[1, 2, 3, 4, 5].forEach( () => e.removeChild(e.children[3]) );
 		})	
 	
 		body.querySelectorAll('.search-results-number').forEach( e => e.innerHTML = e.innerText );
 		body.querySelectorAll('*[href]').forEach( e => e.removeAttribute('href') );
+		body.querySelectorAll('*[url]').forEach( e => e.removeAttribute('url') );
 		body.querySelectorAll('*[onclick]').forEach( e => e.removeAttribute('onclick') );
 		body.querySelectorAll('div').forEach( e => e.style.backgroundColor = 'white');
 		body.querySelector('.block-text-content').style.width = '900px';
 		body.style.width = '900px';
-		document.querySelectorAll('.search-results-content').forEach( e => { e.children[0].style.width = '630px'; e.children[1].style.width = '630px';e.children[2].style.width = '630px' } );
-		document.querySelectorAll('.search-results-data').forEach( e => {e.style.position='relative'; e.style.right = '-20px' ; });
+		document.querySelectorAll('.search-results-content').forEach( e => { e.children[0].style.width = '680px'; e.children[1].style.width = '680px';e.children[2].style.width = '680px' } );
 
 	}
 
@@ -153,8 +177,9 @@ class Paper {
 		let table = document.getElementById('printForm').children[3];
 		body.innerHTML = '';
 		body.appendChild(table);
-		body.width = '900px';
+		body.style.width = '900px';
 		table.width = '900px';
+		table.style.padding = '25px';
 	}
 }
 
@@ -168,3 +193,5 @@ function format_name(s) {
 	}
 	return name_arr;
 }
+
+

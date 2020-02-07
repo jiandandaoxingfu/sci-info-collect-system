@@ -3,9 +3,11 @@ Ref: https://www.cnblogs.com/N1ckeyQu/p/11382195.html.
 */
 
 function html2pdf(title, msg) {
-	return html2canvas( document.body, {
+	console.log(new Date().getSeconds() + '开始生成pdf')
+	return html2canvas( document.body.firstElementChild, {
 		scale: 1,
 	} ).then( (canvas) => {
+		console.log(new Date().getSeconds() + '完成截图')
 		var contentWidth = canvas.width;
 		var contentHeight = canvas.height;
 
@@ -20,6 +22,7 @@ function html2pdf(title, msg) {
 		var imgHeight = 592.28 / contentWidth * contentHeight;
 
 		var pageData = canvas.toDataURL('image/jpeg', 1.0);
+		console.log(pageData);
 
 		var pdf = new jsPDF('', 'pt', 'a4');
 
@@ -42,7 +45,3 @@ function html2pdf(title, msg) {
 		message.send('printed', {msg: msg});
 	});
 }
-
-setTimeout( () => {
-	html2pdf('a', {msg: ''});
-}, 30000)

@@ -1,17 +1,28 @@
 class App {
 	constructor() {
 		this.is_start = false;
-		this.data = [];
+
 		this.sid = '';
-		this.search_win_id = 0;
-		this.detail_win_id = 0;
+		this.qid_arr = '';
+		this.refid_arr = '';
 		this.current_paper_info = {};
+
+		this.search_tab_id = 0;
+		this.detail_tab_id = 0;
+		this.spider_tab_id = 0;
+
+		this.title_arr = [];
+		this.author = '';
+		this.year = '';
+		this.data = [];
 	}
 
 	get_sid() {
 		chrome.tabs.create({
 			active: false,
 			url: "https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com"
+		}, (tab) => {
+			this.spider_tab_id = tab.id;
 		})
 	}
 
@@ -24,10 +35,8 @@ class App {
 		})
 
 		message.on("qid", (msg) => {
-			if( msg.qid ) {
-				this.current_paper_info.qid = msg.qid;
-			} else {
-			}
+			this.current_paper_info.qid = msg.qid;
+			this.current_paper_info.refid = msg.refid;
 		})
 
 		message.on("open_detail_page", (msg) => {
@@ -35,20 +44,21 @@ class App {
 				active: false,
 				url: msg.url
 			}, (tab) => {
-				this.detail_win_id = tab.id;
+				this.detail_tab_id = tab.id;
 			})
 		})
 
 		message.on('get-paras', (msg) => {
 			if(!msg.isDetail) {
-				chrome.tabs.sendMessage(this.search_win_id, {title: "paper-paras", msg: this.current_paper_info}); // 该页面向content页面传递消息，相当于popup --> content
+				chrome.tabs.sendMessage(this.search_tab_id, {title: "paper-paras", msg: this.current_paper_info}); // 该页面向content页面传递消息，相当于popup --> content
 			} else {
-				chrome.tabs.sendMessage(this.detail_win_id, {title: "paper-paras", msg: this.current_paper_info});
+				chrome.tabs.sendMessage(this.detail_tab_id, {title: "paper-paras", msg: this.current_paper_info});
 			}
 		})
 
 		message.on('close-window', (msg) => {
-			// chrome.tabs.remove(this.detail_win_id);
+			this.is_start = false;
+			// chrome.tabs.remove(this.detail_tab_id);
 		})
 	}
 
@@ -68,10 +78,6 @@ class App {
 	}
 
 	render() {
-		if (this.is_start) {
-			alert('请重新启动或者等待任务完成');
-			return;
-		}
 		this.data = [];
 		this.title_arr.forEach((title, id) => {
 			this.data.push({
@@ -94,7 +100,7 @@ class App {
 			active: false,
 			url: url
 		}, (tab) => {
-			this.search_win_id = tab.id;
+			this.search_tab_id = tab.id;
 		})
 	}
 
@@ -111,6 +117,10 @@ document.addEventListener('click', (e) => {
 	if( e.target.tagName.toLowerCase() === 'button' ) {
 		let action = e.target.innerText;
 		if( action === "开始统计" ) {
+			if (this.is_start) {
+				alert('请重新启动或者等待任务完成');
+				return;
+			}
 			if( app.input_valid_check() ) {
 				app.render();
 				app.start();
