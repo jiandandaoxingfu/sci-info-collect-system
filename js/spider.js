@@ -1,8 +1,8 @@
-console.log(100);
 class Spider {
 	get_sid() {
 		let sid = window.location.href.match(/&SID=(.*?)&/);
 		if( sid ) {
+			window.stop();
 			this.sid = sid[1];
 			message.send('sid', {info: true});
 		} else {
@@ -31,7 +31,7 @@ class Spider {
 	}
 
 	get_search_data(id) {
-		this.search_url.replace('_title_', this.title_arr[id]);
+		this.search_url = this.search_url.replace('_title_', this.title_arr[id]);
 		return axios.get(this.search_url).then( res => {
 			let data = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0]
 			this.search_datas[id] = this.data_format(data);
@@ -41,7 +41,7 @@ class Spider {
 	}
 
 	open_cite_page(id) {
-		this.cite_url.replace('_qid_', this.qid_arr[id])
+		this.cite_url = this.cite_url.replace('_qid_', this.qid_arr[id])
 			.replace('_refid_', this.refid_arr[id]);
 		message.send('open-cite-page', {url: this.cite_url, id: id})
 	}
@@ -52,6 +52,7 @@ class Spider {
 			let inputs = document.getElementById('PublicationYear_tr').getElementsByTagName('input');
 			for( let input of inputs ) {
 				if( input.value.includes("2018") ) {
+					this.get_detail_data();
 					input.click();
 					document.getElementById('PublicationYear_tr').querySelector('button[alt="精炼"]').click();
 				}
@@ -61,13 +62,15 @@ class Spider {
 		}
 	}
 
-	get_detail_data(id) {
-		this.detail_url.replace('_qid_', this.qid_arr[id])
+	get_detail_data() {
+		this.detail_url = this.detail_url.replace('_qid_', this.qid_arr[id])
 			.replace('_title_', this.title_arr[id]);
-		return axios.get(this.detail_url).then( res => {
-			let data = res.data.replace(/(\r\n|\r|\n)/);
-			data = this.table_format(data);
-			this.detail_datas[id] = data;
+		message.on('data-id', msg => {
+			return axios.get(this.detail_url).then( res => {
+				let data = res.data.replace(/(\r\n|\r|\n)/);
+				data = this.table_format(data);
+				this.detail_datas[id] = data;
+			})
 		})
 	}
 
@@ -87,6 +90,12 @@ class Spider {
 
 	table_format() {
 
+	}
+
+	run() {
+		this.get_search_data(0).then( () => {
+			this.open_cite_page();
+		})
 	}
 }
 

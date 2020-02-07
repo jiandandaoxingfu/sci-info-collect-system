@@ -6,7 +6,7 @@ class Message {
 	on(title, callback) {
 		chrome.runtime.onMessage.addListener( (req, sender, sendRes) => {
 			if(req.title === title) {
-				callback(req.msg, sender.tab.id);
+				callback(req.msg);
 			}
 		});
 	}

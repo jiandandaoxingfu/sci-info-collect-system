@@ -11,54 +11,6 @@ class App {
 		this.data = [];
 	}
 
-	message_handler() {
-		message.on('sid', msg => {
-			if( !msg.sid ) {
-				alert('无法获取sid');
-			}
-		})
-
-		message.on('open-cite-page', msg => {
-			chrome.tabs.create({
-				active: false,
-				url: msg.url
-			}, (tab) => {
-				this.cite_tabs_id[msg.id] = tab.id;
-			})
-		})
-
-		message.on("no-cite-refine-data", (msg, tabid) => {
-			if( msg.info ) {
-				console.log(this.cite_tabs_id.indexOf(tabid) + ' not found');
-			}
-		});
-
-		message.on('cite-refine-data', (msg, tabid) => {
-			chrome.tabs.remove(tabid);
-			message.send('data-id', {id: this.cite_tabs_id.indexOf(tabid)})
-		} );
-
-		message.on('cite-refine-data-done', (msg, tabid) => {
-			if(msg.info) {
-				chrome.tabs.remove(tabid);
-			}
-		});
-
-		// message.on("open_detail_page", (msg) => {
-		// 	chrome.tabs.create({
-		// 		active: false,
-		// 		url: msg.url
-		// 	}, (tab) => {
-		// 		this.detail_tabs_id = tab.id;
-		// 	})
-		// })
-
-		message.on('close-window', (msg) => {
-			this.is_start = false;
-			// chrome.tabs.remove(this.detail_tab_id);
-		})
-	}
-
 	input_valid_check() {
 		let title_arr = document.getElementById('title').value.replace(/，/g, ',').split(',').map(d => d.replace(/(^\s*)/, ''));
 		let author = document.getElementById('author').value;
@@ -94,19 +46,72 @@ class App {
 		this.is_start = true;
 		chrome.tabs.create({
 			active: false,
-			url: ''
+			url: 'https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com'
 		}, tabid => {
-			message.send(tabid, 'title-arr', {title_arr: this.title_arr});
+			this.spider_tab_id = tabid;
 		})
 	}
 
 	restart() {
 		window.open(window.location.href, '_self');
 	}
+
+	message_handler() {
+		message.on('sid', (msg, tabid) => {
+			if( !msg.info ) {
+				alert('无法获取sid');
+			} else {
+				message.send(tabid, 'title-arr', {title_arr: this.title_arr});
+			}
+		})
+
+		message.on('open-cite-page', msg => {
+			chrome.tabs.create({
+				active: false,
+				url: msg.url
+			}, (tab) => {
+				this.cite_tabs_id[msg.id] = tab.id;
+			})
+		})
+
+		message.on('cite-refine-data', (msg, tabid) => {
+			message.send('data-id', {id: this.cite_tabs_id.indexOf(tabid)})
+		});
+
+		message.on("no-cite-refine-data", (msg, tabid) => {
+			if( msg.info ) {
+				console.log(this.cite_tabs_id.indexOf(tabid) + ' not found');
+			}
+		});
+
+		message.on('cite-refine-data', (msg, tabid) => {
+			chrome.tabs.remove(tabid);
+			message.send('data-id', {id: this.cite_tabs_id.indexOf(tabid)})
+		} );
+
+		message.on('cite-refine-data-done', (msg, tabid) => {
+			if(msg.info) {
+				chrome.tabs.remove(tabid);
+			}
+		});
+
+		// message.on("open_detail_page", (msg) => {
+		// 	chrome.tabs.create({
+		// 		active: false,
+		// 		url: msg.url
+		// 	}, (tab) => {
+		// 		this.detail_tabs_id = tab.id;
+		// 	})
+		// })
+
+		message.on('close-window', (msg) => {
+			this.is_start = false;
+			// chrome.tabs.remove(this.detail_tab_id);
+		})
+	}
 }
 
 var app = new App();
-app.get_sid();
 app.message_handler();
 
 document.addEventListener('click', (e) => {
