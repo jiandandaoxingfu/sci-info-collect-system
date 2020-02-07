@@ -13,7 +13,7 @@ class Spider {
 	get_title_arr() {
 		message.on('title-arr', msg => {
 			this.init(msg.title_arr);
-			message.send('spider', {spider: this});
+			message.send('save-spider', {spider: this});
 			this.run();
 		})
 	}

@@ -4,7 +4,8 @@ class App {
 
 		this.cite_tabs_id = [];
 		this.spider_tab_id = 0;
-
+		this.spider = null;
+		
 		this.title_arr = [];
 		this.author = '';
 		this.year = '';
@@ -65,7 +66,7 @@ class App {
 			}
 		})
 
-		message.on('spider', msg => {
+		message.on('save-spider', msg => {
 			this.spider = msg.spider;
 		})
 
