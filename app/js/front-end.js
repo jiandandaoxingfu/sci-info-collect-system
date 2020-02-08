@@ -7,7 +7,7 @@ class App {
 		this.spider = null;
 
 		this.title_arr = [];
-		this.author = '';
+		this.author_arr = '';
 		this.year = '';
 		this.data = [];
 	}
@@ -21,11 +21,23 @@ class App {
 			return false;
 		} else {
 			this.title_arr = title_arr;
-			this.author = author;
 			this.year = year;
 			this.cite_tabs_id = new Array(title_arr.length).join(',').split(',');
-			return true;
+			return this.name_format(author);
 		}
+	}
+
+	name_format(s) {
+		let s2 = s.split('-');
+		if( s2.length === 3 ) {
+			this.author_arr = [s.replace(/-/g, ''), s2[0]+s2[1]+s2[2].toLocaleLowerCase(), s2[1]+s2[2]+s2[0], s2[1]+s2[2].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0]+s2[2][0], s2[0]+s2[1][0]+s2[2][0].toLocaleLowerCase(), s2[1][0]+s2[2][0]+s2[0], s2[1][0]+s2[2][0].toLocaleLowerCase()+ s2[0] ];
+		} else if( s2.length === 2 ) {
+			this.author_arr = [s.replace(/-/g, ''), s2[0]+s2[1].toLocaleLowerCase(), s2[1]+s2[0], s2[1].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0], s2[0]+s2[1][0].toLocaleLowerCase(), s2[1][0]+s2[0], s2[1][0].toLocaleLowerCase()+ s2[0] ];
+		} else {
+			alert('请检查姓名是否符合要求');
+			return false;
+		}
+		return true;
 	}
 
 	render() {
@@ -59,29 +71,29 @@ class App {
 
 	message_handler() {
 		message.on('is-start', (msg, tabid) => {
-			console.log(new Date().getSeconds() + '查询是否开始');
+			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '查询是否开始');
 			let is_related_tabid = tabid == this.spider_tab_id ||
 											this.cite_tabs_id.indexOf(tabid) > -1;
 			if(this.is_start && is_related_tabid) {
-				console.log(new Date().getSeconds() + '发送开始命令');
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '发送开始命令');
 				message.send(tabid, 'is-start', {info: ''});
 			} else {
-				console.log(new Date().getSeconds() + '无关窗口');
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '无关窗口');
 			}
 		})
 
 		message.on('sid', (msg, tabid) => {
 			if( !msg.info ) {
-				console.log(new Date().getSeconds() + '无法获取sid');
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '无法获取sid');
 			} else {
-				console.log(new Date().getSeconds() + '已经获取sid')
-				message.send(tabid, 'title-arr', {title_arr: this.title_arr});
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已经获取sid')
+				message.send(tabid, 'title-arr', {title_arr: this.title_arr, author_arr: author_arr});
 			}
 		})
 
 		message.on('save-spider', msg => {
 			this.spider = msg.spider;
-			console.log(new Date().getSeconds() + '已保存spider');
+			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已保存spider');
 		})
 
 		message.on('get-spider', (msg, tabid) => {
@@ -94,7 +106,7 @@ class App {
 				url: msg.url
 			}, (tab) => {
 				this.cite_tabs_id[msg.id] = tab.id;
-				console.log(new Date().getSeconds() + '已经打开引用窗口');
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已经打开引用窗口');
 			})
 		})
 
@@ -104,14 +116,14 @@ class App {
 
 		message.on("no-cite-refine-data", (msg, tabid) => {
 			if( msg.info ) {
-				console.log(new Date().getSeconds() + this.cite_tabs_id.indexOf(tabid) + ' not found');
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + this.cite_tabs_id.indexOf(tabid) + ' not found');
 				chrome.tabs.remove(tabid);
 			}
 		});
 
 		message.on('cite-refine-done', (msg, tabid) => {
 			if(msg.info) {
-				message.send(this.spider_tab_id, 'cite-refine-data', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data});
+				message.send(this.spider_tab_id, 'get-cite-refine-data', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data});
 				chrome.tabs.remove(tabid);
 			}
 		});

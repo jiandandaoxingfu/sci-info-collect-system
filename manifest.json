@@ -45,11 +45,9 @@
         "webofscience-css/WoKcommon.css",
         "webofscience-css/WoKcomponents.css",
         "webofscience-css/WoKsummary.css"],
-    "js": ["lib/axios.min.js", 
-        "lib/jspdf.min.js", 
-        "lib/html2canvas.min.js", 
-        "js/html2pdf.js", 
-        "js/message.js", 
+    "js": [
+        "lib/axios.min.js",
+        "js/message.js",
         "js/spider.js"],
     "run_at": "document_start"
   }]
