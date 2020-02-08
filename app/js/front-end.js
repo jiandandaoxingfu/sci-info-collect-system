@@ -5,7 +5,7 @@ class App {
 		this.cite_tabs_id = [];
 		this.spider_tab_id = 0;
 		this.spider = null;
-		
+
 		this.title_arr = [];
 		this.author = '';
 		this.year = '';
@@ -83,14 +83,19 @@ class App {
 			})
 		})
 
-		message.on('get-id', (msg, tabid) => {
-			message.send(tabid, 'get-id', {id: this.cite_tabs_id.indexOf(tabid)})
+		message.on('spider-get-detail-data', (msg, tabid) => {
+			message.send(this.spider_tab_id, 'get-detail-data', {id: this.cite_tabs_id.indexOf(tabid)})
 		});
 
 		message.on("no-cite-refine-data", (msg, tabid) => {
 			if( msg.info ) {
 				console.log(this.cite_tabs_id.indexOf(tabid) + ' not found');
+				chrome.tabs.remove(tabid);
 			}
+		});
+
+		message.on('cite-refine-get-id', (msg, tabid) => {
+			message.send(tabid, 'get-id', {id: this.cite_tabs_id.indexOf(tabid)})
 		});
 
 		message.on('cite-refine-done', (msg, tabid) => {

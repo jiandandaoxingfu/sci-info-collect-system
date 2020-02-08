@@ -53,7 +53,7 @@ class Spider {
 			let inputs = document.getElementById('PublicationYear_tr').getElementsByTagName('input');
 			for( let input of inputs ) {
 				if( input.value.includes("2018") ) {
-					this.get_detail_data();
+					message.send('spider-get-detail-data', {info: ''});
 					input.click();
 					document.getElementById('PublicationYear_tr').querySelector('button[alt="精炼"]').click();
 				}
@@ -63,24 +63,21 @@ class Spider {
 		}
 	}
 
-	get_detail_data() {
-		message.on('get-id', msg => {
-			this.detail_url = this.detail_url.replace('_qid_', this.qid_arr[id])
-				.replace('_title_', this.title_arr[id]);
-			return axios.get(this.detail_url).then( res => {
-				let data = res.data.replace(/(\r\n|\r|\n)/);
-				data = this.table_format(data);
-				this.detail_datas[id] = data;
-			})
+	get_detail_data(id) {
+		this.detail_url = this.detail_url.replace('_qid_', this.qid_arr[id])
+			.replace('_title_', this.title_arr[id]);
+		return axios.get(this.detail_url).then( res => {
+			let data = res.data.replace(/(\r\n|\r|\n)/);
+			data = this.table_format(data);
+			this.detail_datas[id] = data;
 		})
 	}
-
 
 	get_cite_refine_data(data) {
 		data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0]
 		data = this.data_format(data);
 		message.on('get-id', msg => {
-			this.cite_refine_datas[id] = data;
+			this.cite_refine_datas[msg.id] = data;
 			message.send('cite-refine-done', {info: true});
 		})			
 	}
@@ -97,9 +94,12 @@ class Spider {
 		this.get_search_data(0).then( () => {
 			this.open_cite_page(0);
 		})
+
+		message.on('get-detail-data', msg => {
+			this.get_detail_data(msg.id);
+		})
 	}
 }
-
 
 var url = window.location.href;
 var spider;
@@ -117,6 +117,7 @@ message.on('is-start', msg => {
 			spider = msg.spider;
 		})
 	}
+
 	document.addEventListener("DOMContentLoaded", (e) => {
 		let data = document.body.innerHTML;
 		if( url.match(/CitingArticles.do\?.*?search_mode=CitingArticles/) ) {
