@@ -48,8 +48,8 @@ class App {
 		chrome.tabs.create({
 			active: false,
 			url: 'https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com'
-		}, tabid => {
-			this.spider_tab_id = tabid;
+		}, tab => {
+			this.spider_tab_id = tab.id;
 		})
 	}
 
@@ -58,16 +58,30 @@ class App {
 	}
 
 	message_handler() {
+		message.on('is-start', (msg, tabid) => {
+			console.log(new Date().getSeconds() + '查询是否开始');
+			let is_related_tabid = tabid == this.spider_tab_id ||
+											this.cite_tabs_id.indexOf(tabid) > -1;
+			if(this.is_start && is_related_tabid) {
+				console.log(new Date().getSeconds() + '发送开始命令');
+				message.send(tabid, 'is-start', {info: ''});
+			} else {
+				console.log(new Date().getSeconds() + '无关窗口');
+			}
+		})
+
 		message.on('sid', (msg, tabid) => {
 			if( !msg.info ) {
-				alert('无法获取sid');
+				console.log(new Date().getSeconds() + '无法获取sid');
 			} else {
+				console.log(new Date().getSeconds() + '已经获取sid')
 				message.send(tabid, 'title-arr', {title_arr: this.title_arr});
 			}
 		})
 
 		message.on('save-spider', msg => {
 			this.spider = msg.spider;
+			console.log(new Date().getSeconds() + '已保存spider');
 		})
 
 		message.on('get-spider', (msg, tabid) => {
@@ -80,6 +94,7 @@ class App {
 				url: msg.url
 			}, (tab) => {
 				this.cite_tabs_id[msg.id] = tab.id;
+				console.log(new Date().getSeconds() + '已经打开引用窗口');
 			})
 		})
 
@@ -89,21 +104,22 @@ class App {
 
 		message.on("no-cite-refine-data", (msg, tabid) => {
 			if( msg.info ) {
-				console.log(this.cite_tabs_id.indexOf(tabid) + ' not found');
+				console.log(new Date().getSeconds() + this.cite_tabs_id.indexOf(tabid) + ' not found');
 				chrome.tabs.remove(tabid);
 			}
 		});
 
 		message.on('cite-refine-get-id', (msg, tabid) => {
+			console.log(new Date().getSeconds() + '发送id：' + this.cite_tabs_id.indexOf(tabid));
 			message.send(tabid, 'get-id', {id: this.cite_tabs_id.indexOf(tabid)})
 		});
 
 		message.on('cite-refine-done', (msg, tabid) => {
 			if(msg.info) {
+				message.send(this.spider_tab_id, 'cite-refine-data', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data});
 				chrome.tabs.remove(tabid);
 			}
 		});
-
 	}
 }
 
