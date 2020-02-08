@@ -39,7 +39,18 @@
 
   "content_scripts": [{
     "matches": ["<all_urls>"],
-    "js": ["lib/axios.min.js", "lib/jspdf.min.js", "lib/html2canvas.min.js", "js/html2pdf.js", "js/message.js", "js/spider.js"],
+    "css": [
+        "webofscience-css/main.css",
+        "webofscience-css/source-sans-pro.min.css",
+        "webofscience-css/WoKcommon.css",
+        "webofscience-css/WoKcomponents.css",
+        "webofscience-css/WoKsummary.css"],
+    "js": ["lib/axios.min.js", 
+        "lib/jspdf.min.js", 
+        "lib/html2canvas.min.js", 
+        "js/html2pdf.js", 
+        "js/message.js", 
+        "js/spider.js"],
     "run_at": "document_start"
   }]
 }

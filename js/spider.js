@@ -6,7 +6,6 @@ class Spider {
 			this.sid = sid[1];
 			message.send('sid', {info: true});
 			console.log(new Date().getSeconds() + '成功获取sid')
-			// window.stop();
 		} else {
 			message.send('sid', {info: false});
 			console.log(new Date().getSeconds() + '无法获取sid')
@@ -127,6 +126,9 @@ class Spider {
 		message.on('cite-refine-data', msg => {
 			this.cite_refine_datas[msg.id] = msg.data;
 			console.log(new Date().getSeconds() + ' 已保存refine data');
+			document.body.innerHTML = this.search_datas[0];
+			document.body.innerHTML += this.cite_refine_datas[0];
+			document.body.innerHTML += this.detail_tables[0];
 		})
 	}
 }
