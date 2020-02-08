@@ -109,17 +109,20 @@ class App {
 			}
 		});
 
-		message.on('cite-refine-get-id', (msg, tabid) => {
-			console.log(new Date().getSeconds() + '发送id：' + this.cite_tabs_id.indexOf(tabid));
-			message.send(tabid, 'get-id', {id: this.cite_tabs_id.indexOf(tabid)})
-		});
-
 		message.on('cite-refine-done', (msg, tabid) => {
 			if(msg.info) {
 				message.send(this.spider_tab_id, 'cite-refine-data', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data});
 				chrome.tabs.remove(tabid);
 			}
 		});
+
+		message.on('single-done', msg => {
+			console.log(`第${msg.id + 1}个已经完成`)
+		})
+
+		message.on('done', msg => {
+			console.log(`完成了`);
+		})
 	}
 }
 
