@@ -106,11 +106,49 @@ class Spider {
 	}
 
 	data_format(data) {
-		return data;
+		let body = document.body;
+		body.innerHTML = data;
+		body.querySelector('.search-results').style.padding = '25px';
+		for(let e of body.getElementsByClassName("nodisplay") ) { e.parentElement.removeChild(e) }
+		[	body.querySelectorAll('*[style="display: none"]'),
+			document.querySelectorAll('script'),
+			body.querySelectorAll('*[type="hidden"]'),
+			body.querySelectorAll('*[style="display: none;"]'),
+			body.querySelectorAll('.search-results-checkbox'),
+			body.querySelectorAll('.alum'),
+			body.querySelectorAll('span.smallV110')
+		].filter( e => e.length > 0 )
+	 	.forEach( eles => eles.forEach( e => e.parentElement.removeChild(e) ) );
+
+		body.querySelectorAll('.search-results-content').forEach( e => {
+		 	[1, 2, 3, 4, 5].forEach( () => {
+		 		if( e.children[3])
+		 			e.removeChild(e.children[3])
+		 	});
+		})	
+
+		body.querySelectorAll('a.smallV110').forEach( e => e.innerHTML = e.innerText );
+		body.querySelectorAll('.search-results-number').forEach( e => e.innerHTML = e.innerText );
+		body.querySelectorAll('*[href]').forEach( e => e.removeAttribute('href') );
+		body.querySelectorAll('*[url]').forEach( e => e.removeAttribute('url') );
+		body.querySelectorAll('*[onclick]').forEach( e => e.removeAttribute('onclick') );
+		body.querySelectorAll('*[alt]').forEach( e => e.removeAttribute('alt') );
+		body.querySelectorAll('*[title]').forEach( e => e.removeAttribute('title') );
+		body.querySelectorAll('*[oncontextmenu]').forEach( e => e.removeAttribute('oncontextmenu') );
+		body.querySelectorAll('*[hasautosubmit]').forEach( e => e.removeAttribute('hasautosubmit') );
+		body.querySelectorAll('*[name]').forEach( e => e.removeAttribute('name') );
+		return body.innerHTML;
 	}
 
 	table_format(data) {
-		return data;
+		let body = document.body;
+		body.innerHTML = data;
+		let table = body.querySelectorAll('table')[2];
+		body.innerHTML = '';
+		body.appendChild(table);
+		table.style.padding = '25px';
+		body.setAttribute('class', 'printWhitePage')
+		return body.innerHTML;
 	}
 
 	run() {
