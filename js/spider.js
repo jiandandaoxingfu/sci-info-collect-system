@@ -19,15 +19,17 @@ class Spider {
 			this.init(msg);
 			this.save_spider();
 			this.run(0);
+			this.run(1);
+			this.run(2);
 		})
 	}
 
 	save_spider() {
 		// 信息传递无法传函数，因此，我们将函数字符化而作为属性
-		this.get_cite_data_ = this.get_cite_data.toString();
-		this.get_cite_refine_data_ = this.get_cite_refine_data.toString();
-		this.data_format_ = this.data_format.toString();
-		this.get_cite_num_ = this.get_cite_num.toString();
+		spider.get_cite_data_ = spider.get_cite_data.toString();
+		spider.get_cite_refine_data_ = spider.get_cite_refine_data.toString();
+		spider.data_format_ = spider.data_format.toString();
+		spider.get_cite_num_ = spider.get_cite_num.toString();
 		message.send('save-spider', {spider: this});
 		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '正在保存spider');
 	}
@@ -59,7 +61,6 @@ class Spider {
 
 			if(Math.min(...this.search_states[msg.id]) === 2) { // 这个标题完成了
 				message.send('single-done', {id: msg.id});
-				console.log('开始下一个');
 				this.next();
 			}
 		})
@@ -115,31 +116,34 @@ class Spider {
 			.replace('_title_', this.title_arr[id]);
 		return axios.get(this.detail_url).then( res => {
 			let data = res.data.replace(/(\r\n|\r|\n)/g, '');
-			data = this.table_format(data);
-			this.detail_tables[id] = data;
+			this.detail_tables[id] = this.table_format(data);
 			this.search_states[id][2] = 2;
 			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已经保存detail data');
 
 			if(Math.min(...this.search_states[id]) === 2) { // 这个标题完成了
 				message.send('single-done', {id: id});
-				console.log('开始下一个');
 				this.next();
 			}
 		})
 	}
 
 	get_cite_refine_data(data) {
+		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '开始处理精炼结果')
 		data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0]
-		this.data_format(data);
-		data = this.get_cite_num();
+		data = this.data_format(data);
+		data = this.get_cite_num(data);
 		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '发送refine data');
 		message.send('cite-refine-done', {info: true, data: data});
 	}
 
 	data_format(data) {
+		console.log('数据正在处理');
 		let body = document.body;
 		body.innerHTML = data;
-		body.querySelector('.search-results').style.padding = '25px';
+		data = body.querySelector('.search-results');
+		body.innerHTML = '';
+		body.appendChild(data);
+		data.style.padding = '25px';
 		for(let e of body.getElementsByClassName("nodisplay") ) { e.parentElement.removeChild(e) }
 		[	body.querySelectorAll('*[style="display: none"]'),
 			body.querySelectorAll('script'),
@@ -159,7 +163,7 @@ class Spider {
 		})	
 
 		body.querySelectorAll('.search-results-data-icon').forEach( e => {
-			e.previousSibling.innerHTML += '<span class="high-cite">高被引</span>';
+			e.previousSibling.innerHTML += '<br><span class="high-cite">高被引</span>';
 			e.parentElement.removeChild(e);
 		})
 		body.querySelectorAll('a.smallV110').forEach( e => e.innerHTML = e.innerText );
@@ -167,21 +171,25 @@ class Spider {
 		['href', 'url', 'onclick', 'alt', 'title', 'oncontextmenu', 'hasautosubmit', 'name'].forEach( attr => {
 			body.querySelectorAll(`*[${attr}]`).forEach( e => e.removeAttribute(attr) );
 		})
+		console.log('数据已处理');
 		return body.innerHTML;
 	}
 
 	table_format(data) {
+		console.log('正在处理表格');
 		let body = document.body;
 		body.innerHTML = data;
-		let table = body.querySelectorAll('table')[2];
+		data = body.querySelectorAll('table')[2];
 		body.innerHTML = '';
-		body.appendChild(table);
-		table.style.padding = '25px';
+		body.appendChild(data);
+		data.style.padding = '25px';
 		body.setAttribute('class', 'printWhitePage');
+		console.log('表格处理完成');
 		return body.innerHTML;
 	}
 
-	get_cite_num() {
+	get_cite_num(data) {
+		console.log('正在处理引用');
 		let body = document.body;
 		body.innerHTML = data;
 		let self_cite_num = 0, other_cite_num = 0;
@@ -189,21 +197,22 @@ class Spider {
 			let authors = [];
 			author_div.children[1].querySelectorAll('a').forEach( a => {
 				authors.push( a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
-    		})	
+    		})
     		let author_union = new Set([...authors, ...this.author_arr]);
     		if( author_union.size === (authors.length + this.author_arr.length) ) {
-    			e.nextElementSibling.innerHTML += `<span class='cite-num'>被引</span>`;
+    			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>被引</span>`;
 				other_cite_num += 1;
     		} else {
-    			e.nextElementSibling.innerHTML += `<span class='cite-num'>自引</span>`;
+    			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>自引</span>`;
 				self_cite_num += 1;
     		}
 		})
+		console.log('完成引用处理');
 		return {data: body.innerHTML, cite_num: [other_cite_num, self_cite_num]};
 	}
 
 	run(id) {
-		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '开始运行');
+		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${id + 1}个开始运行`);
 		this.get_search_data(id).then( () => {
 			this.open_cite_page(id);
 		})
@@ -218,14 +227,23 @@ class Spider {
 			}
 		}
 		message.send('done', {spider: spider});
+		this.done();
 	}
 
 	done() {
+		document.body.innerHTML = '';
 		for(let i=0; i<this.qid_arr.length; i++) {
 			document.body.innerHTML += this.search_datas[i];
 			document.body.innerHTML += this.cite_refine_datas[i];
 			document.body.innerHTML += this.detail_tables[i];
 		}
+		let children = document.body.children;
+		for(let child of children) {
+			let page_break = document.createElement('div');
+			page_break.setAttribute('style', 'page-break-after: always;');
+			document.body.insertBefore(page_break, child);
+		}
+		document.body.removeChild(document.body.firstElementChild);
 		window.print();
 	}
 }
@@ -271,6 +289,8 @@ message.on('is-start', msg => {
 		spider.get_cite_refine_data = eval(spider.get_cite_refine_data_.replace(/^((\w|_)+)(\(.*?\))/, '$1 = $3 => '));
 		spider.data_format = eval(spider.data_format_.replace(/^((\w|_)+)(\(.*?\))/, '$1 = $3 => '));
 		spider.get_cite_num = eval(spider.get_cite_num_.replace(/^((\w|_)+)(\(.*?\))/, '$1 = $3 => '));
+		//	eval执行后，函数中this指向window。
+		window.author_arr = spider.author_arr;
 
 		let data = document.body.innerHTML;
 		if( url.match(/CitingArticles.do\?.*?search_mode=CitingArticles/) ) {

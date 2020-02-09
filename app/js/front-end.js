@@ -87,7 +87,7 @@ class App {
 				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '无法获取sid');
 			} else {
 				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已经获取sid')
-				message.send(tabid, 'title-arr', {title_arr: this.title_arr, author_arr: author_arr});
+				message.send(tabid, 'title-arr', {title_arr: this.title_arr, author_arr: this.author_arr});
 			}
 		})
 
