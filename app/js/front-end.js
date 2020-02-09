@@ -9,6 +9,7 @@ class App {
 		this.title_arr = [];
 		this.author_arr = '';
 		this.year = '';
+		this.threads = 3;
 		this.data = [];
 	}
 
@@ -71,23 +72,20 @@ class App {
 
 	message_handler() {
 		message.on('is-start', (msg, tabid) => {
-			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '查询是否开始');
 			let is_related_tabid = tabid == this.spider_tab_id ||
 											this.cite_tabs_id.indexOf(tabid) > -1;
 			if(this.is_start && is_related_tabid) {
 				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '发送开始命令');
 				message.send(tabid, 'is-start', {info: ''});
-			} else {
-				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '无关窗口');
 			}
 		})
 
 		message.on('sid', (msg, tabid) => {
 			if( !msg.info ) {
-				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '无法获取sid');
+				alert('无法获取web of science权限，请检查是否具有使用其权限。一般而言要使用校园网');
 			} else {
 				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已经获取sid')
-				message.send(tabid, 'title-arr', {title_arr: this.title_arr, author_arr: this.author_arr});
+				message.send(tabid, 'init-data', {title_arr: this.title_arr, author_arr: this.author_arr, threads: this.threads});
 			}
 		})
 
@@ -100,6 +98,18 @@ class App {
 			message.send(tabid, 'spider', {spider: this.spider});
 		})
 
+		message.on('search-info', msg => {
+			if( msg.info === 'success' ) {
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${msg.id}个搜索成功`);
+			} else if( msg.info === 'not unique' ) {
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${msg.id}个搜索结果不唯一`);
+			} else if( msg.info === 'success & no cite' ) {
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${id + 1}个搜索完成，0引用`);
+			} else {
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${msg.id}个搜索失败`);
+			}
+		});
+
 		message.on('open-cite-page', msg => {
 			chrome.tabs.create({
 				active: false,
@@ -110,8 +120,15 @@ class App {
 			})
 		})
 
-		message.on('spider-get-detail-data', (msg, tabid) => {
-			message.send(this.spider_tab_id, 'get-detail-data', {id: this.cite_tabs_id.indexOf(tabid)})
+		message.on('cite-info', (msg, tabid) => {
+			if( msg.info === 'has-2018-cite' ) {
+				message.send(this.spider_tab_id, 'detail-&-journal-info-data', {id: this.cite_tabs_id.indexOf(tabid)})
+			} else if( msg.info === 'no-2018-cite' ){
+
+			} else {
+			
+			}
+			console.log(msg.info);
 		});
 
 		message.on("no-cite-refine-data", (msg, tabid) => {

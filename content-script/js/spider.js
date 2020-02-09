@@ -12,20 +12,19 @@ class Spider {
 		}
 	}
 
-	get_title_arr() {
-		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '正在监听title arr');
-		message.on('title-arr', msg => {
-			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已获取title arr');
-			this.init(msg);
+	start() {
+		message.on('init-data', init_data => {
+			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已获取title & author arr');
+			this.init(init_data);
 			this.save_spider();
-			this.run(0);
-			this.run(1);
-			this.run(2);
+			for(let i=0; i<this.threads; i++) {
+				this.crawl(i);
+			}
 		})
 	}
 
 	save_spider() {
-		// 信息传递无法传函数，因此，我们将函数字符化而作为属性
+		// 信息传递无法传函数，因此，我们将函数字符化而作为属性，之后恢复。
 		spider.get_cite_data_ = spider.get_cite_data.toString();
 		spider.get_cite_refine_data_ = spider.get_cite_refine_data.toString();
 		spider.data_format_ = spider.data_format.toString();
@@ -34,23 +33,27 @@ class Spider {
 		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '正在保存spider');
 	}
 
-	init(msg) {
-		let n = msg.title_arr.length;
+	init(data) {
+		let n = data.title_arr.length;
 		this.qid_arr = [];
 		this.refid_arr = [];
-		this.title_arr = msg.title_arr;
-		this.author_arr = msg.author_arr;
+		this.title_arr = data.title_arr;
+		this.author_arr = data.author_arr;
+		this.journal_arr = new Array(n).join(',').split(',');
 		this.search_datas = new Array(n).join(',').split(',');
 		this.cite_refine_datas = new Array(n).join(',').split(',');
 		this.detail_tables = new Array(n).join(',').split(',');
-		this.search_states = new Array(n).join(',').split(',').map( e => [0, 0, 0] ); // search, cite-refine, detail.　0/1/2: undo/do/done.
+		this.search_states = new Array(n).join(',').split(',').map( e => [0, 0, 0, 0] ); // search, cite-refine, detail，journal.　0/1/2: undo/doing/done.
 		this.cite_num_arr = new Array(n).join(',').split(',').map( e => [0, 0] );
 		this.search_url = `https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com/WOS_GeneralSearch.do?fieldCount=1&action=search&product=WOS&search_mode=GeneralSearch&SID=${this.sid}&max_field_count=25&max_field_notice=%E6%B3%A8%E6%84%8F%3A+%E6%97%A0%E6%B3%95%E6%B7%BB%E5%8A%A0%E5%8F%A6%E4%B8%80%E5%AD%97%E6%AE%B5%E3%80%82&input_invalid_notice=%E6%A3%80%E7%B4%A2%E9%94%99%E8%AF%AF%3A+%E8%AF%B7%E8%BE%93%E5%85%A5%E6%A3%80%E7%B4%A2%E8%AF%8D%E3%80%82&exp_notice=%E6%A3%80%E7%B4%A2%E9%94%99%E8%AF%AF%3A+%E4%B8%93%E5%88%A9%E6%A3%80%E7%B4%A2%E8%AF%8D%E5%8F%AF%E4%BB%A5%E5%9C%A8%E5%A4%9A%E4%B8%AA%E5%AE%B6%E6%97%8F%E4%B8%AD%E6%89%BE%E5%88%B0+%28&input_invalid_notice_limits=+%3Cbr%2F%3E%E6%B3%A8%E6%84%8F%3A+%E6%BB%9A%E5%8A%A8%E6%A1%86%E4%B8%AD%E6%98%BE%E7%A4%BA%E7%9A%84%E5%AD%97%E6%AE%B5%E5%BF%85%E9%A1%BB%E8%87%B3%E5%B0%91%E4%B8%8E%E4%B8%80%E4%B8%AA%E5%85%B6%E4%BB%96%E6%A3%80%E7%B4%A2%E5%AD%97%E6%AE%B5%E7%9B%B8%E7%BB%84%E9%85%8D%E3%80%82&sa_params=WOS%7C%7C7AVrjhmEcJpyJsy2QBT%7Chttp%3A%2F%2Fapps.webofknowledge.com%7C%27&formUpdated=true&value%28input1%29=_title_&value%28select1%29=TI&value%28hidInput1%29=&limitStatus=collapsed&ss_lemmatization=On&ss_spellchecking=Suggest&SinceLastVisit_UTC=&SinceLastVisit_DATE=&period=Range+Selection&range=ALL&startYear=1985&endYear=2020&editions=SCI&editions=SSCI&editions=AHCI&editions=ISTP&editions=ESCI&editions=CCR&editions=IC&update_back2search_link_param=yes&ssStatus=display%3Anone&ss_showsuggestions=ON&ss_numDefaultGeneralSearchFields=1&ss_query_language=&rs_sort_by=PY.D%3BLD.D%3BSO.A%3BVL.D%3BPG.A%3BAU.A`; // sid, title
 		this.cite_url = `https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+CitingArticles.do?product=WOS&SID=${this.sid}&search_mode=CitingArticles&parentProduct=WOS&parentQid=_qid_&parentDoc=1&REFID=_refid_&logEventUT=WOS:000340351500004&excludeEventConfig=ExcludeIfFromNonInterProduct&cacheurlFromRightClick=no`; // sid, qid, refid,
 		this.detail_url = `https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com/OutboundService.do?action=go&displayCitedRefs=true&displayTimesCited=true&displayUsageInfo=true&viewType=summary&product=WOS&mark_id=WOS&colName=WOS&search_mode=GeneralSearch&locale=zh_CN&view_name=WOS-summary&sortBy=PY.D%3BLD.D%3BSO.A%3BVL.D%3BPG.A%3BAU.A&mode=outputService&qid=_qid_&SID=${this.sid}&format=formatForPrint&filters=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&selectedIds=1&mark_to=1&mark_from=1&queryNatural=_title_&count_new_items_marked=0&MaxDataSetLimit=&use_two_ets=false&DataSetsRemaining=&IsAtMaxLimit=&IncitesEntitled=yes&value(record_select_type)=pagerecords&markFrom=1&markTo=1&fields_selection=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&&&totalMarked=1`; // qid, sid, title
+		this.journal_info_url = `https://www.fenqubiao.com/_journal_`;
+		this.threads = data.threads;
 
-		message.on('get-detail-data', msg => {
+		message.on('get-detail-&-journal-info-data', msg => {
 			this.get_detail_data(msg.id);
+			this.get_journal_data(msg.id);
 		})
 
 		message.on('get-cite-refine-data', msg => {
@@ -73,13 +76,46 @@ class Spider {
 		this.search_states[id][0] = 1;
 		this.search_url = this.search_url.replace('_title_', this.title_arr[id]);
 		return axios.get(this.search_url).then( res => {
-			let data = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];
-			this.search_datas[id] = this.data_format(data);
-			this.qid_arr[id] = res.data.match(/qid=(\d+)/)[1];
-			this.refid_arr[id] = res.data.match(/REFID=(\d+)/)[1];
-			this.search_states[id][0] = 2;
-			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '完成搜索');
+			let records = res.data.match(/id="RECORD_\d+"/g);
+			let info = '';
+			if( records ) {
+				if( records.length === 1 ) {
+					info = 'success';
+					let data = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];
+					this.journal_arr[id] = data.match(/<value>(.*?)<\/value>/)[1];
+					this.search_datas[id] = this.data_format(data);
+					this.qid_arr[id] = res.data.match(/qid=(\d+)/)[1];
+					this.refid_arr[id] = res.data.match(/REFID=(\d+)/)[1];
+					this.search_states[id][0] = 2;
+					if( !document.querySelectorAll('a.snowplow-times-cited-link') ) { // 0引用
+						this.search_states[id][1] = 2;
+						this.search_states[id][2] = 2;
+						this.search_states[id][3] = 2;
+						info = 'success & no cite';
+					}
+				} else {
+					info = 'not unique';
+					this.search_states[id][0] = -1;
+				}
+			} else {
+				info = 'not found';
+				this.search_states[id][0] = -1;
+			}
+			message.send('search-info', {info: info, id: id});
 		})
+	}
+
+	get_journal_data(id) { 
+		// 根据期刊名称获取其中科院分区信息
+		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '正在获取期刊的分区信息');
+		this.search_states[id][3] = 1;
+		this.journal_info_url = this.journal_info_url.replace('_journal_', journal);
+		axios.get(this.search_url).then( res => {
+			let data = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];
+			this.journal_datas[id] = this.data_format(data);
+			this.search_states[id][3] = 2;
+			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已经获取期刊的分区信息');
+		});
 	}
 
 	open_cite_page(id) {
@@ -91,21 +127,24 @@ class Spider {
 	}
 
 	get_cite_data(data) {
-		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '引用页面处理')
-		let has_2018 = document.getElementById('PublicationYear_tr').innerHTML.includes('PublicationYear_2018');
-		if( has_2018 ) {
-			let inputs = document.getElementById('PublicationYear_tr').getElementsByTagName('input');
-			for( let input of inputs ) {
-				if( input.value.includes("2018") ) {
-					message.send('spider-get-detail-data', {info: ''});
-					input.click();
-					document.getElementById('PublicationYear_tr').querySelector('button[alt="精炼"]').click();
-					console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '精炼')
+		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '引用页面数据处理')
+		let tr = document.getElementById('PublicationYear_tr');
+		if( tr ) {
+			let has_2018 = .innerHTML.includes('PublicationYear_2018');
+			if( has_2018 ) {
+				let inputs = document.getElementById('PublicationYear_tr').getElementsByTagName('input');
+				for( let input of inputs ) {
+					if( input.value.includes("2018") ) {
+						message.send('cite-info', {info: 'has-2018-cite'});
+						input.click();
+						document.getElementById('PublicationYear_tr').querySelector('button[alt="精炼"]').click();
+					}
 				}
+			} else {
+				message.send("cite-info", {info: 'no-2018-cite'});
 			}
 		} else {
-			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '无2018引用');
-			message.send("no-cite-refine-data", {info: true});
+			message.send("cite-info", {info: 'cite-page-error'});
 		}
 	}
 
@@ -128,17 +167,20 @@ class Spider {
 	}
 
 	get_cite_refine_data(data) {
-		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '开始处理精炼结果')
-		data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0]
-		data = this.data_format(data);
-		data = this.get_cite_num(data);
-		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '发送refine data');
-		message.send('cite-refine-done', {info: true, data: data});
+		let records = data.match(/id="RECORD_\d+"/g);
+		if( records ) {
+			data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0]
+			data = this.data_format(data);
+			data = this.get_cite_num(data);
+			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '发送refine data');
+			message.send('cite-refine-done', {info: true, data: data});
+		} else {
+			message.send('error', {info: "cite-refine-error"});
+		}
 	}
 
 	data_format(data) {
 		console.log('数据正在处理');
-		let body = document.body;
 		body.innerHTML = data;
 		data = body.querySelector('.search-results');
 		body.innerHTML = '';
@@ -177,7 +219,6 @@ class Spider {
 
 	table_format(data) {
 		console.log('正在处理表格');
-		let body = document.body;
 		body.innerHTML = data;
 		data = body.querySelectorAll('table')[2];
 		body.innerHTML = '';
@@ -190,10 +231,9 @@ class Spider {
 
 	get_cite_num(data) {
 		console.log('正在处理引用');
-		let body = document.body;
 		body.innerHTML = data;
 		let self_cite_num = 0, other_cite_num = 0;
-		document.body.querySelectorAll('.search-results-content').forEach( author_div => {
+		body.querySelectorAll('.search-results-content').forEach( author_div => {
 			let authors = [];
 			author_div.children[1].querySelectorAll('a').forEach( a => {
 				authors.push( a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
@@ -211,10 +251,12 @@ class Spider {
 		return {data: body.innerHTML, cite_num: [other_cite_num, self_cite_num]};
 	}
 
-	run(id) {
+	crawl(id) {
 		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${id + 1}个开始运行`);
 		this.get_search_data(id).then( () => {
-			this.open_cite_page(id);
+			if( this.search_states[id][0] == 2 && this.search_states[id][1] === 0 ) {
+				this.open_cite_page(id);
+			}
 		})
 	}
 
@@ -223,7 +265,7 @@ class Spider {
 		let finished_num = 0;
 		for(let i=0; i<n; i++) {
 			if( Math.max(...this.search_states[i]) === 0 ) {
-				this.run(i);
+				this.crawl(i);
 				return
 			} else if( Math.min(...this.search_states[i]) === 2 ) {
 				finished_num += 1;
@@ -237,7 +279,6 @@ class Spider {
 	}
 
 	done() {
-		let body = document.body;
 		body.innerHTML = '';
 		for(let i=0; i<this.qid_arr.length; i++) {
 			body.innerHTML += this.search_datas[i];
@@ -257,39 +298,30 @@ class Spider {
 }
 
 var url = window.location.href;
+var body;
 var spider;
 
 message.send('is-start', {info: ''});
 
 message.on('is-start', msg => {
-	console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '接收开始命令')
 	if( url.includes('UA_GeneralSearch_input.do?') ) {
 		spider = new Spider();
 		spider.get_sid();
-		spider.get_title_arr();
-	} else {
-		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '不是spider window');
+		spider.start();
+	} else if( url.includes('webofknowledge') ){
 		message.send('get-spider', {info: ''});
 		message.on('spider', msg => {
 			spider = msg.spider;
-			if(!spider) {
-				message.send('sid', {info: false});
-			} else {
-				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已经获取spider');
-			}
 		})
+	} else {
+		return;
 	}
 
 	document.addEventListener("DOMContentLoaded", (e) => {
+		body = document.body;
 		if( url.includes('UA_GeneralSearch_input.do?') ) {
-			document.body.innerHTML = '';
+			body.innerHTML = '';
 			document.head.innerHTML = '';
-			return;
-		}
-
-		console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + 'dom ready');
-		if(!spider) {
-			console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '无法获取spider');
 			return;
 		}
 
@@ -300,7 +332,7 @@ message.on('is-start', msg => {
 		//	eval执行后，函数中this指向window。
 		window.author_arr = spider.author_arr;
 
-		let data = document.body.innerHTML;
+		let data = body.innerHTML;
 		if( url.match(/CitingArticles.do\?.*?search_mode=CitingArticles/) ) {
 			window.stop();
 			spider.get_cite_data(data);
@@ -311,6 +343,3 @@ message.on('is-start', msg => {
 		}
 	})
 })
-
-
-console.log(new Date().getMinutes() + ':' + new Date().getSeconds());
