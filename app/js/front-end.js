@@ -104,7 +104,7 @@ class App {
 			} else if( msg.info === 'not unique' ) {
 				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${msg.id}个搜索结果不唯一`);
 			} else if( msg.info === 'success & no cite' ) {
-				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${id + 1}个搜索完成，0引用`);
+				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${msg.id + 1}个搜索完成，0引用`);
 			} else {
 				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + `第${msg.id}个搜索失败`);
 			}
@@ -116,33 +116,31 @@ class App {
 				url: msg.url
 			}, (tab) => {
 				this.cite_tabs_id[msg.id] = tab.id;
-				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + '已经打开引用窗口');
+				console.log(msg.id + ' : ' + new Date().getMinutes() + ':' + new Date().getSeconds() + '已经打开引用窗口');
 			})
 		})
 
 		message.on('cite-info', (msg, tabid) => {
+			message.send(this.spider_tab_id, 'cite-info', {id: this.cite_tabs_id.indexOf(tabid), info: msg.info});
 			if( msg.info === 'has-2018-cite' ) {
-				message.send(this.spider_tab_id, 'detail-&-journal-info-data', {id: this.cite_tabs_id.indexOf(tabid)})
+
 			} else if( msg.info === 'no-2018-cite' ){
-
-			} else {
-			
-			}
-			console.log(msg.info);
-		});
-
-		message.on("no-cite-refine-data", (msg, tabid) => {
-			if( msg.info ) {
-				console.log(new Date().getMinutes() + ':' + new Date().getSeconds() + this.cite_tabs_id.indexOf(tabid) + ' not found');
+				chrome.tabs.remove(tabid);
+			} else { // error
 				chrome.tabs.remove(tabid);
 			}
+			console.log(this.cite_tabs_id.indexOf(tabid) + ' : ' + msg.info);
 		});
 
-		message.on('cite-refine-done', (msg, tabid) => {
+		message.on('cite-refine-info', (msg, tabid) => {
+			chrome.tabs.remove(tabid);
+			message.send(this.spider_tab_id, 'cite-refine-info', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data});
 			if(msg.info) {
-				message.send(this.spider_tab_id, 'get-cite-refine-data', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data});
-				chrome.tabs.remove(tabid);
+				
+			} else { // error
+				
 			}
+			console.log(this.cite_tabs_id.indexOf(tabid) + ' : cite-refine-data' + msg.info);
 		});
 
 		message.on('single-done', msg => {
