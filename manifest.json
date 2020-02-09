@@ -5,50 +5,44 @@
   "author": "JMx",
   "homepage_url": "http://github.com/jiandandaoxingfu/chrome-extension",
   "icons": {
-    "16": "img/icon.png",
-    "32": "img/icon.png",
-    "48": "img/icon.png",
-    "64": "img/icon.png"
+    "16": "icon.png",
+    "32": "icon.png",
+    "48": "icon.png",
+    "64": "icon.png"
   },
 
   "description": "用于科研成果统计",
   "permissions": [
     "tabs",
-    "storage",
-    "contextMenus",
-    "webRequest",
-    "webRequestBlocking",
-    "activeTab",
-    "<all_urls>"
+    "https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com*"
   ],
 
   "browser_action": {
-    "default_popup": "html/popup.html",
+    "default_popup": "popup.html",
     "default_icon": {
-      "16": "img/icon.png",
-      "32": "img/icon.png",
-      "48": "img/icon.png",
-      "64": "img/icon.png"
+      "16": "icon.png",
+      "32": "icon.png",
+      "48": "icon.png",
+      "64": "icon.png"
     }
   },
 
   "background": {
-    "page": "html/background.html",
     "president": false
   },
 
   "content_scripts": [{
-    "matches": ["<all_urls>"],
+    "matches": ["https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com*"],
     "css": [
-        "webofscience-css/main.css",
-        "webofscience-css/source-sans-pro.min.css",
-        "webofscience-css/WoKcommon.css",
-        "webofscience-css/WoKcomponents.css",
-        "webofscience-css/WoKsummary.css"],
+        "content-script/css/main.css",
+        "content-script/css/source-sans-pro.min.css",
+        "content-script/css/WoKcommon.css",
+        "content-script/css/WoKcomponents.css",
+        "content-script/css/WoKsummary.css"],
     "js": [
-        "lib/axios.min.js",
-        "js/message.js",
-        "js/spider.js"],
+        "content-script/lib/axios.min.js",
+        "content-script/js/message.js",
+        "content-script/js/spider.js"],
     "run_at": "document_start"
   }]
 }

@@ -220,31 +220,39 @@ class Spider {
 
 	next() {
 		let n = this.search_states.length;
+		let finished_num = 0;
 		for(let i=0; i<n; i++) {
 			if( Math.max(...this.search_states[i]) === 0 ) {
 				this.run(i);
 				return
+			} else if( Math.min(...this.search_states[i]) === 2 ) {
+				finished_num += 1;
 			}
 		}
-		message.send('done', {spider: spider});
-		this.done();
+		
+		if( finished_num === n ) {
+			message.send('done', {spider: spider});
+			this.done();
+		}
 	}
 
 	done() {
-		document.body.innerHTML = '';
+		let body = document.body;
+		body.innerHTML = '';
 		for(let i=0; i<this.qid_arr.length; i++) {
-			document.body.innerHTML += this.search_datas[i];
-			document.body.innerHTML += this.cite_refine_datas[i];
-			document.body.innerHTML += this.detail_tables[i];
+			body.innerHTML += this.search_datas[i];
+			body.innerHTML += this.cite_refine_datas[i];
+			body.innerHTML += this.detail_tables[i];
 		}
-		let children = document.body.children;
-		for(let child of children) {
+		[...body.children].forEach( child => {
 			let page_break = document.createElement('div');
 			page_break.setAttribute('style', 'page-break-after: always;');
-			document.body.insertBefore(page_break, child);
-		}
-		document.body.removeChild(document.body.firstElementChild);
-		window.print();
+			body.insertBefore(page_break, child);
+		});
+		body.removeChild(body.firstElementChild);
+		setTimeout( () => {
+			window.print();
+		}, 1500);
 	}
 }
 
@@ -303,3 +311,6 @@ message.on('is-start', msg => {
 		}
 	})
 })
+
+
+console.log(new Date().getMinutes() + ':' + new Date().getSeconds());

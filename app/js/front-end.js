@@ -134,6 +134,7 @@ class App {
 
 		message.on('done', msg => {
 			console.log(`完成了`);
+			app.spider = msg.spider;
 		})
 	}
 }
