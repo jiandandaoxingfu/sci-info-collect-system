@@ -1,55 +1,72 @@
-# MaiTab
-MaiTab是一款chrome插件，用于代替新标签页，同时提供了一系列辅助功能，包括自动清理百度搜索的广告.
+## 科研成果统计系统
 
-## 使用方法
-- 将项目下载到本地
-- 参考[如何使用Chrome浏览器，打包生成自己的插件](https://blog.csdn.net/wanwuguicang/article/details/79742017)
-- 安装好插件后，在插件的选项页可设置是否开启搜索广告清理
+### 功能
 
-## 项目结构
-```
-MaiTab:
-│  .gitattributes
-│  .gitignore
-│  list.txt
-│  manifest.json
-|  HISTORY.md
-│  README.md
-│  
-├─css
-│      newtab.css
-│      option.css
-│      popup.css
-│      
-├─html
-│      newtab.html
-│      option.html
-│      popup.html
-│      
-├─img
-│      icon128.png
-│      icon16.png
-│      icon48.png
-│      
-├─js
-│      background.js
-│      content-script.js
-│      newtab.js
-│      option.js
-│      popup.js
-│      
-└─lib
-        bootstrap.min.css
-        jquery-min-1.12.4.js
-        switch-button.css
-```
+#### 输入 
 
-## 已知问题
-在360极速浏览器上使用时，导致覆写的newtab无效，暂时没有解决方案
+1. 文章标题列表：title1, title2, title3, ...
 
-## 备注
-本产品仅限针对百度搜索
+   两个标题间以逗号隔开。
 
-如果使用过程中发现未能正常清理广告，请先检查是否在此插件的选项页开启了对应设置，如果开启设置未生效，请刷新即可.
+2. 年份：2018, 2019，...
 
-有任何bug或使用时的问题请联系acerola.orion@qq.com
+   用以筛选特定时间内引用这篇文献的论文，不同年份以逗号隔开。
+
+3. 作者姓名：Chen-Jing-Run
+
+   输入姓名拼音，首字母均大写且以短横杠隔开。
+
+#### 输出 
+
+1. 总引用量：每篇文献的总被引量。
+2. 2019引用量：每篇文献在2019年的被引量：包含自引和他引。
+3. 自引：每篇文献的在2019的自引量。
+4. 他引：每篇文献的在2019的他引量。
+5. 打印引用文献列表：每篇文献的被引论文列表页面的pdf文件，且已经标记"自引"，"他引"。
+6. 打印详情页：每篇文献的详情页面的pdf文件。
+
+### 操作界面及示例
+
+#### 整体如下
+
+![](https://cdn.nlark.com/yuque/0/2020/png/122742/1578901578488-7e64cf1f-b0ad-435a-bad3-3b6bbcb83e06.png)
+
+#### 按钮介绍
+
+1. 开始统计：输入标题列表，年份，作者以后即可点击运行。
+2. 重新启动：如果想要暂停/重新统计，或者出现故障，可以点击重新启动。
+3. 导出：导出统计表格。
+
+#### 工作界面
+
+![](https://cdn.nlark.com/yuque/0/2020/png/122742/1578902213305-a833097c-b8cc-4aef-ba7e-e6d8021058cb.png)
+
+
+
+
+
+### 第三方库
+
+1. React：create-react-app.
+2. Electron.
+3. Antd.
+4. 上述库的若干依赖.
+
+### 
+
+### Q&A
+
+1. 软件运行较慢？
+
+   由于数据是从[Web of Science](http://apps.webofknowledge.com/)获取，而其服务器在国外，因此访问速度较慢。此外，软件还受网速的影响。
+
+2. 软件是否可以一直使用？
+
+   不可以。由于数据是从[Web of Science](http://apps.webofknowledge.com/)获取，如果该网站更新系统，则软件可能无法正常使用。
+
+
+## Todos
+
+1. 登录中科院分区系统，根据杂志名过去分区信息。
+2. 添加子窗口，加快信息处理。
+3. 增加异常处理和信息反馈。
