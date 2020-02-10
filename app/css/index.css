@@ -1,3 +1,13 @@
 #container {
 	overflow: scroll;
 }
+
+.table {
+	text-align: center;
+}
+
+td:nth-child(2) {
+
+	text-align: left;
+	width: 300px !important;
+}

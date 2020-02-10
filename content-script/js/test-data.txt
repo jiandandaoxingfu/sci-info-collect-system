@@ -1,0 +1,84 @@
+Modulation instability and dynamics for the Hermitian symmetric space derivative nonlinear Schrodinger equation, 0引用，Geng Xianguo.
+
+Periodic and rational solutions of the reduced Maxwell-Bloch equations, 31, Geng Xianguo, 13个2018引用。
+
+soliton,
+
+Dynamics of mixed lump-solitary waves of an extended (2+1)-dimensional shallow water wave model， 2018 0引用
+
+Lump and interaction solutions to the (2+1)-dimensional Burgers equation，  wanghui， 2018 3引用.
+
+Group invariant solutions to a centro-affine invariant flow， 0引用
+
+Riemann-Hilbert approach for multisoliton solutions of generalized coupled fourth-order nonlinear Schrodinger equations， 0 引用
+
+---------------,
+
+Phenotypic and Genotypic Characterization of Streptomycin-Resistant Multidrug-Resistant Mycobacterium tuberculosis Clinical Isolates in Southern China， 0引用，
+
+Inverse scattering transform and soliton classification of the coupled modified Korteweg-de Vries equation， 15引用，耿献国，2018 4个引用
+
+Backlund transformations, rational solutions and soliton-cnoidal wave solutions of the modified Kadomtsev-Petviashvili equation， 10引用，2018 0引用，
+
+Reduced nuclear translocation of serum response factor is associated with skeletal muscle atrophy in a cigarette smoke-induced mouse model of COPD， 8引用， 2018 4引用，
+
+Integrability aspects and multi-soliton solutions of a new coupled Gerdjikov-Ivanov derivative nonlinear Schrodinger equation， 2引用， 2018 0引用
+
+peakon， 
+
+soliton,
+
+BICENTENNIAL OF THE GREAT PONCELET THEOREM (1813-2013): CURRENT ADVANCES 11 引用， 2018 1引用
+
+RhBMP-2 loaded 3D-printed mesoporous silica/calcium phosphate cement porous scaffolds with enhanced vascularization and osteogenesis properties 25 引用， 2018 11引用
+
+Full Poncelet Theorem in Minkowski dS and AdS Spaces， 5引用， 2018 0引用
+
+Transplantation of Mesenchymal Stem Cells Attenuates Pulmonary Hypertension by Normalizing the Endothelial-to-Mesenchymal Transition， 1引用， 2018 0引用
+
+Applications of dispersive analytical wave solutions of nonlinear seventh order Lax and Kaup-Kupershmidt dynamical wave equations， 1引用， 2018 0引用
+
+system, 
+
+A Simple Proof of Poncelet's Theorem (on the Occasion of Its Bicentennial), 9 引用， 2018 3引用
+
+The Great Emch Closure Theorem and a combinatorial proof of Poncelet's Theorem， 1引用， 2018 1引用
+
+Nanocements produced from mesoporous bioactive glass nanoparticles， 16引用， 2018 3引用
+
+
+
+
+
+
+
+
+
+ [2, 0, 0, 0, 1]  1: v
+ [2, 2, 2, 2, 1]  2: v
+ [-1, 0, 0, 0, 1]  3: v
+ [2, 0, 0, 0, 1]  4: v
+[2, 2, 2, 2, 1]  5: v
+[2, 0, 0, 0, 1]  6: v
+[2, 0, 0, 0, 1]  7: v
+[-1, 0, 0, 0, 1]  8: v 
+[2, 0, 0, 0, 1]  9: v
+[2, 2, 2, 2, 1]  10: v
+[2, 0, 0, 0, 1]  11: v
+[-1, 0, 0, 0, 1]  12: 
+[2, 0, 0, 0, 1]  13: v
+[-1, 0, 0, 0, 1]  14: v
+[-1, 0, 0, 0, 1]  15: v
+[2, 2, 2, 2, 1]  16: v
+[2, 2, 2, 2, 1]  17: v
+[2, 0, 0, 0, 1]  18: v
+[2, 0, 0, 0, 1]  19: v
+[2, 0, 0, 0, 1]  20: v
+[-1, 0, 0, 0, 1]  21: v
+[2, 2, 2, 2, 1]  22: v
+[2, 2, 2, 2, 1]  23: v
+[2, 2, 2, 2, 1] 24: v
+
+
+
+Modulation instability and dynamics for the Hermitian symmetric space derivative nonlinear Schrodinger equation,  Periodic and rational solutions of the reduced Maxwell-Bloch equations, soliton, Dynamics of mixed lump-solitary waves of an extended (2+1)-dimensional shallow water wave model， Lump and interaction solutions to the (2+1)-dimensional Burgers equation， Group invariant solutions to a centro-affine invariant flow， Riemann-Hilbert approach for multisoliton solutions of generalized coupled fourth-order nonlinear Schrodinger equations， ---------------, Phenotypic and Genotypic Characterization of Streptomycin-Resistant Multidrug-Resistant Mycobacterium tuberculosis Clinical Isolates in Southern China， Inverse scattering transform and soliton classification of the coupled modified Korteweg-de Vries equation， Backlund transformations rational solutions and soliton-cnoidal wave solutions of the modified Kadomtsev-Petviashvili equation， Reduced nuclear translocation of serum response factor is associated with skeletal muscle atrophy in a cigarette smoke-induced mouse model of COPD， Integrability aspects and multi-soliton solutions of a new coupled Gerdjikov-Ivanov derivative nonlinear Schrodinger equation， peakon，  soliton, BICENTENNIAL OF THE GREAT PONCELET THEOREM (1813-2013): CURRENT ADVANCES , RhBMP-2 loaded 3D-printed mesoporous silica/calcium phosphate cement porous scaffolds with enhanced vascularization and osteogenesis properties, Full Poncelet Theorem in Minkowski dS and AdS Spaces， Transplantation of Mesenchymal Stem Cells Attenuates Pulmonary Hypertension by Normalizing the Endothelial-to-Mesenchymal Transition， Applications of dispersive analytical wave solutions of nonlinear seventh order Lax and Kaup-Kupershmidt dynamical wave equations， system,  A Simple Proof of Poncelet's Theorem (on the Occasion of Its Bicentennial), The Great Emch Closure Theorem and a combinatorial proof of Poncelet's Theorem， Nanocements produced from mesoporous bioactive glass nanoparticles

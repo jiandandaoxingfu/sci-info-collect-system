@@ -372,5 +372,6 @@ message.on('is-start', msg => {
 			message.send('cite-refine-get-id', {info: ''});
 			spider.get_cite_refine_data(data);
 		}
+		// https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+summary.do?message_key=Server.internalError&error_display_redirect=true&message_mode=CitingArticles&product=WOS&search_mode=GeneralSearch&qid=13&SID=8EAAMvRzlM7P5AtVsSa#searchErrorMessage
 	})
 })

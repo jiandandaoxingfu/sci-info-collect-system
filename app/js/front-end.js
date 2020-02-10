@@ -10,7 +10,9 @@ class App {
 		this.author_arr = '';
 		this.year = '';
 		this.threads = 3;
-		this.data = [];
+		this.table_header = ['#', '标题', '检索页', '引用量', '他引量', '自引量', '详情页', '期刊分区页', '作者顺序', '进度'];
+		this.header_en = {'#': 'num', '标题': 'title', '检索页': 'search', '引用量': 'cite-num', '他引量': 'other-cite-num', 
+			'自引量': 'self-cite-num', '详情页': 'detail', '期刊分区页': 'journal', '作者顺序': 'order', '进度': 'process'};
 	}
 
 	input_valid_check() {
@@ -26,8 +28,46 @@ class App {
 			this.year = year;
 			this.threads = threads;
 			this.cite_tabs_id = new Array(title_arr.length).join(',').split(',');
+			this.create_table();
 			return this.name_format(author);
 		}
+	}
+
+	create_table() {
+		let container = document.getElementById('container');
+		container.innerHTML = 
+			`<table class="table">
+  				<thead>
+    				<tr>
+      					${(() => { 
+      						let tr = ''; 
+      						this.table_header.forEach( h => {
+      							tr += `<th scope="col">${h}</th>`;
+      						})
+      						return tr;
+      					})()}
+    				</tr>
+  				</thead>
+  				<tbody>
+  					${(() => {
+  						let tbody = '';
+  						this.title_arr.forEach( (t, id) => {
+  							let tr = '<tr>';
+  							this.table_header.forEach( (h, i) => {
+  								if( i == 0 ) {
+  									tr += `<td id="${this.header_en[h]}-${id}">${id + 1}</td>`;
+  								} else if( i == 1 ) {
+  									tr += `<td id="${this.header_en[h]}-${id}" title="${t}">${t.slice(0, 30)}... </td>`;
+  								} else {
+  									tr += `<td id="${this.header_en[h]}-${id}"></td>`;
+  								}
+  							})
+  							tbody += (tr + '</tr>');
+  						})
+  						return tbody;
+  					})()}
+  				</tbody>
+			</table>`
 	}
 
 	name_format(s) {
@@ -130,7 +170,6 @@ class App {
 			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : ' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			message.send(this.spider_tab_id, 'cite-info', {id: this.cite_tabs_id.indexOf(tabid), info: msg.info});
 			if( msg.info !== 'has-2018-cite' ) {
-				console.log('cite-info');
 				chrome.tabs.remove(tabid);
 				this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
 			}
@@ -139,7 +178,6 @@ class App {
 		message.on('cite-refine-info', (msg, tabid) => {
 			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : cite-refine-data' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			message.send(this.spider_tab_id, 'cite-refine-info', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data, info: msg.info});
-			console.log('cite-refine-info');
 			chrome.tabs.remove(tabid);
 			this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
 		});
@@ -151,6 +189,8 @@ class App {
 		message.on('done', msg => {
 			console.log( `完成了` + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			app.spider = msg.spider;
+			app.is_start = false;
+			app.cite_tabs_id = [];
 		})
 	}
 }
@@ -162,7 +202,7 @@ document.addEventListener('click', (e) => {
 	if( e.target.tagName.toLowerCase() === 'button' ) {
 		let action = e.target.innerText;
 		if( action === "开始统计" ) {
-			if (this.is_start) {
+			if( this.is_start ) {
 				alert('请重新启动或者等待任务完成');
 				return;
 			}
