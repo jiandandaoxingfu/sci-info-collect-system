@@ -5,10 +5,10 @@
   "author": "JMx",
   "homepage_url": "http://github.com/jiandandaoxingfu/chrome-extension",
   "icons": {
-    "16": "icon.png",
-    "32": "icon.png",
-    "48": "icon.png",
-    "64": "icon.png"
+    "16": "img/icon.png",
+    "32": "img/icon.png",
+    "48": "img/icon.png",
+    "64": "img/icon.png"
   },
 
   "description": "用于科研成果统计",
@@ -20,10 +20,10 @@
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "icon.png",
-      "32": "icon.png",
-      "48": "icon.png",
-      "64": "icon.png"
+      "16": "img/icon.png",
+      "32": "img/icon.png",
+      "48": "img/icon.png",
+      "64": "img/icon.png"
     }
   },
 
