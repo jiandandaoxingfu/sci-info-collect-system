@@ -127,29 +127,21 @@ class App {
 		})
 
 		message.on('cite-info', (msg, tabid) => {
+			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : ' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			message.send(this.spider_tab_id, 'cite-info', {id: this.cite_tabs_id.indexOf(tabid), info: msg.info});
-			if( msg.info === 'has-2018-cite' ) {
-
-			} else if( msg.info === 'no-2018-cite' ){
-				chrome.tabs.remove(tabid);
-				this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
-			} else { // error
+			if( msg.info !== 'has-2018-cite' ) {
+				console.log('cite-info');
 				chrome.tabs.remove(tabid);
 				this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
 			}
-			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : ' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		});
 
 		message.on('cite-refine-info', (msg, tabid) => {
+			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : cite-refine-data' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
+			message.send(this.spider_tab_id, 'cite-refine-info', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data, info: msg.info});
+			console.log('cite-refine-info');
 			chrome.tabs.remove(tabid);
 			this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
-			message.send(this.spider_tab_id, 'cite-refine-info', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data, info: msg.info});
-			if(msg.info) {
-				
-			} else { // error
-				
-			}
-			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : cite-refine-data' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		});
 
 		message.on('single-done', msg => {
