@@ -17,11 +17,11 @@ class App {
 	}
 
 	input_valid_check() {
-		let title_arr = document.getElementById('title').value.replace(/，/g, ',').split(',').map(d => d.replace(/(^\s*)/, ''));
+		let title_arr = document.getElementById('title').value.split('&&').map(d => d.replace(/(^\s*)/, ''));
 		let author = document.getElementById('author').value;
 		let threads = parseInt(document.getElementById('threads').value);
 		let year = document.getElementById('year').value.replace(/，/g, ',').replace(/\s/g, '').split(',');
-		if (title_arr[0] === "" || author === '' || year[0] === "") {
+		if (title_arr[0] === "" || this.name_format(author) || year[0] === "") {
 			alert('请输入标题， 年份， 作者');
 			return false;
 		} else {
@@ -30,7 +30,7 @@ class App {
 			this.threads = threads;
 			this.cite_tabs_id = new Array(title_arr.length).join(',').split(',');
 			this.create_table();
-			return this.name_format(author);
+			return true;
 		}
 	}
 
