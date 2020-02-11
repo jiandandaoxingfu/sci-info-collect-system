@@ -315,16 +315,16 @@ class Spider {
 			body.innerHTML += this.detail_tables[i];
 		}
 		[...body.children].forEach( child => {
-			let page_break = document.createElement('div');
-			page_break.setAttribute('style', 'page-break-after: always;');
-			body.insertBefore(page_break, child);
+			if( child.tagName.toLowerCase() !== 'h2' ) {
+				let page_break = document.createElement('div');
+				page_break.setAttribute('style', 'page-break-after: always;');
+				body.insertBefore(page_break, child);
+			}
 		});
-		if( body.children ) body.removeChild(body.firstElementChild);
-		setTimeout( () => {
-			window.print();
-		}, 1500);
+		body.removeChild(body.querySelector('div[style="page-break-after: always;"]'));
 		console.log('done');
 		console.log(this);
+		alert('已经搜索完成，打印该页面即可。');
 	}
 }
 
