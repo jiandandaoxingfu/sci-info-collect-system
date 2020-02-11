@@ -104,8 +104,8 @@ class Spider {
 			let info = '';
 			if( records ) {
 				if( records.length === 1 ) {
-					this.search_states[id][0] = 2;
 					info = 'success';
+					this.search_states[id][0] = 2;
 					let data = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];
 					this.journal_arr[id] = data.match(/<value>(.*?)<\/value>/)[1];
 					this.search_datas[id] = this.data_format(data);
@@ -275,7 +275,7 @@ class Spider {
 	crawl(id) {
 		console.log(`${id + 1} : 个开始运行` + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		this.get_search_data(id).then( () => {
-			if( this.search_states[id][0] == 2 ) {
+			if( this.search_states[id][0] == 2 && this.search_states[id][4] == 0 ) {
 				this.open_cite_page(id);
 			}
 		})
