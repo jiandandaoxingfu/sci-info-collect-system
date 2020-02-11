@@ -5,16 +5,13 @@ class Spider {
 		if( sid ) {
 			this.sid = sid[1];
 			message.send('sid', {info: true});
-			console.log('成功获取sid' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		} else {
 			message.send('sid', {info: false});
-			console.log('无法获取sid' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		}
 	}
 
 	start() {
 		message.on('init-data', init_data => {
-			console.log('已获取title & author arr' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			this.init(init_data);
 			this.save_spider();
 			let n = Math.min(this.threads, this.title_arr.length);
@@ -36,6 +33,7 @@ class Spider {
 
 	init(data) {
 		let n = data.title_arr.length;
+		this.is_start = true;
 		this.qid_arr = [];
 		this.refid_arr = [];
 		this.title_arr = data.title_arr;
@@ -59,7 +57,6 @@ class Spider {
 					this.search_states[msg.id][1] = -1;
 				}
 				message.send('single-done', {id: msg.id});
-				this.next();
 			} else {
 				this.search_states[msg.id][1] = 1;
 				this.get_detail_data(msg.id);
@@ -68,22 +65,14 @@ class Spider {
 		})
 
 		message.on('cite-refine-info', msg => {
-			// if( msg.info ) {
-				this.search_states[msg.id][1] = 2;
-				this.cite_refine_datas[msg.id] = msg.data.data;
-				this.cite_num_arr[msg.id] = msg.data.cite_num;
-				console.log(msg.id + 1 + ' : ' + '已保存refine data' + new Date().getMinutes() + ':' + new Date().getSeconds() );
-				if( !this.search_states[msg.id].includes(1) ) { // 这个标题完成了
-					this.search_states[msg.id][4] = 1;
-					message.send('single-done', {id: msg.id});
-					this.next();
-				}
-			// } else { // error
-			// 	this.search_states[msg.id][1] = -1;
-			// 	this.search_states[msg.id][4] = 1;
-			// 	message.send('single-done', {id: msg.id});
-			// 	this.next();
-			// }
+			this.search_states[msg.id][1] = 2;
+			this.cite_refine_datas[msg.id] = msg.data.data;
+			this.cite_num_arr[msg.id] = msg.data.cite_num;
+			console.log(msg.id + 1 + ' : ' + '已保存refine data' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+			if( !this.search_states[msg.id].includes(1) ) { // 这个标题完成了
+				this.search_states[msg.id][4] = 1;
+				message.send('single-done', {id: msg.id});
+			}
 		})
 
 		message.on('error', msg => { 
@@ -91,9 +80,18 @@ class Spider {
 			this.search_states[msg.id][1] = -1;
 			this.search_states[msg.id][4] = 1;
 			message.send('single-done', {id: msg.id});
-			this.next();
 		});
-		
+
+		message.on('next', msg => {
+			this.next();
+		})
+
+		setInterval(() => {
+			if( this.is_start ) {
+				message.send('search_states', {state: this.search_states, cite_num: this.cite_num_arr});
+			}
+		}, 3000);
+
 		console.log('已初始化' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 	}
 
@@ -129,7 +127,6 @@ class Spider {
 			if( info !== 'success' ) {
 				this.search_states[id][4] = 1;
 				message.send('single-done', {id: id});
-				this.next();
 			}
 
 			message.send('search-info', {info: info, id: id});
@@ -149,7 +146,6 @@ class Spider {
 		// 	}
 		// 	if( !this.search_states[id].includes(1) ) { // 这个标题完成了
 		// 		message.send('single-done', {id: id});
-		// 		this.next();
 		// 	}
 		// })
 	}
@@ -164,7 +160,7 @@ class Spider {
 	get_cite_data(data) {
 		let tr = document.getElementById('PublicationYear_tr');
 		if( tr ) {
-			let has_2018 = body.innerHTML.includes('PublicationYear_2018');
+			let has_2018 = document.querySelector('body').innerHTML.includes('PublicationYear_2018');
 			if( has_2018 ) {
 				let inputs = document.getElementById('PublicationYear_tr').getElementsByTagName('input');
 				for( let input of inputs ) {
@@ -196,30 +192,22 @@ class Spider {
 			}
 			if( !this.search_states[id].includes(1) ) { // 这个标题完成了
 				message.send('single-done', {id: id});
-				this.next();
 			}
 		})
 	}
 
 	get_cite_refine_data(data) {
 		// 由于精炼页面时从引用页面自然进来，因此基本不会出错。
-		// let records = data.match(/id="RECORD_\d+"/g);
-		// if( records ) {
-			data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0]
-			data = this.data_format(data);
-			data = this.get_cite_num(data);
-			message.send('cite-refine-info', {info: true, data: data});
-		// } else {
-		// 	message.send('cite-refine-info', {info: false, data: ''});
-		// }
+		data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];
+		data = this.data_format(data);
+		data = this.get_cite_num(data);
+		message.send('cite-refine-info', {info: true, data: data});
 	}
 
 	data_format(data) {
-		body = document.body;
+		let body = document.createElement('div');
 		body.innerHTML = data;
 		data = body.querySelector('.search-results');
-		body.innerHTML = '';
-		body.appendChild(data);
 		data.style.padding = '25px';
 		for(let e of body.getElementsByClassName("nodisplay") ) { e.parentElement.removeChild(e) }
 		[	body.querySelectorAll('*[style="display: none"]'),
@@ -252,7 +240,7 @@ class Spider {
 	}
 
 	table_format(data) {
-		body = document.body;
+		let body = document.createElement('div');
 		body.innerHTML = data;
 		data = body.querySelectorAll('table');
 		if( data[2] ) {
@@ -261,16 +249,13 @@ class Spider {
 			data[2].style.padding = '25px';
 			body.setAttribute('class', 'printWhitePage');
 			return body.innerHTML;
-		} else {
-			message.send('')
-			return '';
 		}
 	}
 
 	get_cite_num(data) {
-		body.innerHTML = data;
+		document.querySelector('body').innerHTML = data;
 		let self_cite_num = 0, other_cite_num = 0;
-		body.querySelectorAll('.search-results-content').forEach( author_div => {
+		document.querySelector('body').querySelectorAll('.search-results-content').forEach( author_div => {
 			let authors = [];
 			author_div.children[1].querySelectorAll('a').forEach( a => {
 				authors.push( a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
@@ -284,7 +269,7 @@ class Spider {
 				self_cite_num += 1;
     		}
 		})
-		return {data: body.innerHTML, cite_num: [other_cite_num, self_cite_num]};
+		return {data: document.querySelector('body').innerHTML, cite_num: [other_cite_num, self_cite_num]};
 	}
 
 	crawl(id) {
@@ -314,8 +299,10 @@ class Spider {
 	}
 
 	done() {
+		let body = document.querySelector('body');
+		this.is_start = false;
 		message.send('done', {spider: spider});
-		body.innerHTML = '';
+		document.querySelector('body').innerHTML = '';
 		for(let i=0; i<this.qid_arr.length; i++) {
 			body.innerHTML += `<h2>${i + 1} ： ${this.title_arr[i]}</h2>`;
 			body.innerHTML += this.search_datas[i];
@@ -337,13 +324,12 @@ class Spider {
 }
 
 var url = window.location.href;
-var body;
 var spider;
 
 message.send('is-start', {info: ''});
 
 message.on('is-start', msg => {
-	if( url.includes('UA_GeneralSearch_input.do?') ) {
+	if( url.includes('UA_GeneralSearch_input\.do\?') ) {
 		spider = new Spider();
 		spider.get_sid();
 		spider.start();
@@ -357,9 +343,8 @@ message.on('is-start', msg => {
 	}
 
 	document.addEventListener("DOMContentLoaded", (e) => {
-		body = document.body;
-		if( url.includes('UA_GeneralSearch_input.do?') ) {
-			body.innerHTML = '';
+		if( url.includes('UA_GeneralSearch_input\.do\?') ) {
+			document.querySelector('body').innerHTML = '';
 			document.head.innerHTML = '';
 			return;
 		}
@@ -371,7 +356,7 @@ message.on('is-start', msg => {
 		//	eval执行后，函数中this指向window。
 		window.author_arr = spider.author_arr;
 		window.stop();
-		let data = body.innerHTML;
+		let data = document.querySelector('body').innerHTML;
 		if( url.match(/CitingArticles\.do\?.*?search_mode=CitingArticles/) ) {
 			spider.get_cite_data(data);
 		} else if( url.match(/Search\.do\?.*?search_mode=CitingArticles/) ) {

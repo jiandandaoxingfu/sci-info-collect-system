@@ -90,20 +90,35 @@ class App {
 		return true;
 	}
 
-	render() {
-		this.data = [];
-		this.title_arr.forEach((title, id) => {
-			this.data.push({
-				id: id + 1,
-				title: title,
-				search_result: '',
-				cite_num: '',
-				cite_page_printed: '',
-				detail_page_printed: '',
-				progress_status: [0, "normal"],
+	update_render() {
+		this.search_states.forEach((state, id) => {
+			let state_key = ['search', 'cite-refine', 'detail', 'journal', 'process'];
+			state.forEach( (s, i) => {
+				if( i !== 1 ) {
+					if( s === -1 ) {
+						document.getElementById(state_key[i] + '-' + id).innerText = '出错';
+					} else if( s === 1 ) {
+						document.getElementById(state_key[i] + '-' + id).innerText = '进行中';
+					} else if( s === 2 ) {
+						document.getElementById(state_key[i] + '-' + id).innerText = '完成';
+					}
+				} else if( i === 1) {
+					if( s === 1 || s === -1 ) {
+						let info = s == 1 ? '进行中' : '完成';
+						document.getElementById('cite-num-' + id).innerText = info;
+						document.getElementById('other-cite-num-' + id).innerText = info;
+						document.getElementById('self-cite-num-' + id).innerText = info;
+					} else if( s === 2 ) {
+						document.getElementById('cite-num-' + id).innerText = this.cite_num[id][0] + this.cite_num[id][1];
+						document.getElementById('other-cite-num-' + id).innerText = this.cite_num[id][0];
+						document.getElementById('self-cite-num-' + id).innerText = this.cite_num[id][1];
+					}
+				}
 			})
 		})
 	}
+
+
 
 	start() {
 		this.is_start = true;
@@ -149,6 +164,13 @@ class App {
 			}
 		})
 
+		message.on('search_states', msg => {
+			console.log(msg.state);
+			this.search_states = msg.state;
+			this.cite_num = msg.cite_num;
+			this.update_render();
+		})
+
 		message.on('save-spider', msg => {
 			this.spider = msg.spider;
 			console.log( '已保存spider' + new Date().getMinutes() + ':' + new Date().getSeconds() );
@@ -171,6 +193,7 @@ class App {
 		});
 
 		message.on('open-cite-page', msg => {
+			if( !this.is_start ) return;
 			chrome.tabs.create({
 				active: false,
 				url: msg.url
@@ -183,32 +206,28 @@ class App {
 		message.on('cite-info', (msg, tabid) => {
 			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : ' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			message.send(this.spider_tab_id, 'cite-info', {id: this.cite_tabs_id.indexOf(tabid), info: msg.info});
-			if( msg.info !== 'has-2018-cite' ) {
-				chrome.tabs.remove(tabid);
-				this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
-			}
 		});
 
 		message.on('cite-refine-info', (msg, tabid) => {
 			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : cite-refine-data' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			message.send(this.spider_tab_id, 'cite-refine-info', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data, info: msg.info});
-			chrome.tabs.remove(tabid);
-			this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
 		});
 
 		message.on('error', (msg, tabid) => {
 			if( msg.info === 'server') {
-				console.log('服务器出错');
+				console.log(this.cite_tabs_id.indexOf(tabid) + 1 + '：' + '服务器出错');
 			} else {
-				console.log('未知错误：' + msg.url);
+				console.log(this.cite_tabs_id.indexOf(tabid) + 1 + '：' + '未知错误：' + msg.url);
 			}
 			message.send(this.spider_tab_id, 'error', {id: this.cite_tabs_id.indexOf(tabid)});
-			chrome.tabs.remove(tabid);
-			this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
 		});
 
 		message.on('single-done', msg => {
-			console.log(  `${msg.id + 1} 完成` + new Date().getMinutes() + ':' + new Date().getSeconds() );
+			let tabid = this.cite_tabs_id[msg.id];
+			if( tabid !== '' ) chrome.tabs.remove(tabid);
+			this.cite_tabs_id[msg.id] = '';
+			console.log(`${msg.id + 1}：完成` + new Date().getMinutes() + ':' + new Date().getSeconds() );
+			message.send(this.spider_tab_id, 'next', {});
 		})
 
 		message.on('done', msg => {
@@ -233,7 +252,6 @@ document.addEventListener('click', (e) => {
 				return;
 			}
 			if( app.input_valid_check() ) {
-				app.render();
 				app.start();
 			}
 		} else if( action === "重新启动" ) {
