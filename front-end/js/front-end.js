@@ -11,8 +11,8 @@ class App {
 		this.author_arr = '';
 		this.year = '';
 		this.threads = 3;
-		this.table_header = ['#', '标题', '检索页', '引用量', '他引量', '自引量', '详情页', '期刊分区页', '作者顺序', '进度'];
-		this.header_en = {'#': 'num', '标题': 'title', '检索页': 'search', '引用量': 'cite-num', '他引量': 'other-cite-num', 
+		this.table_header = ['#', '标题', '检索页', '引用页', '引用量', '他引量', '自引量', '详情页', '期刊分区页', '作者顺序', '进度'];
+		this.header_en = {'#': 'num', '标题': 'title', '检索页': 'search', '引用页': 'cite-refine', '引用量': 'cite-num', '他引量': 'other-cite-num', 
 			'自引量': 'self-cite-num', '详情页': 'detail', '期刊分区页': 'journal', '作者顺序': 'order', '进度': 'process'};
 	}
 
@@ -90,28 +90,30 @@ class App {
 		return true;
 	}
 
-	update_render() {
-		this.search_states.forEach((state, id) => {
+	update_render(data) {
+		data.search_states.forEach((state, id) => {
 			let state_key = ['search', 'cite-refine', 'detail', 'journal', 'process'];
 			state.forEach( (s, i) => {
-				if( i !== 1 ) {
-					if( s === -1 ) {
-						document.getElementById(state_key[i] + '-' + id).innerText = '出错';
-					} else if( s === 1 ) {
-						document.getElementById(state_key[i] + '-' + id).innerText = '进行中';
+				if( i !== 1 && i !== 4 ) {
+					if( s === 1 || s === -1 ) {
+						let info = s == 1 ? '进行中' : '出错';
+						document.getElementById(state_key[i] + '-' + id).innerText = info;
 					} else if( s === 2 ) {
 						document.getElementById(state_key[i] + '-' + id).innerText = '完成';
 					}
 				} else if( i === 1) {
 					if( s === 1 || s === -1 ) {
-						let info = s == 1 ? '进行中' : '完成';
-						document.getElementById('cite-num-' + id).innerText = info;
-						document.getElementById('other-cite-num-' + id).innerText = info;
-						document.getElementById('self-cite-num-' + id).innerText = info;
+						let info = s == 1 ? '进行中' : '出错';
+						document.getElementById('cite-refine-' + id).innerText = info;
 					} else if( s === 2 ) {
-						document.getElementById('cite-num-' + id).innerText = this.cite_num[id][0] + this.cite_num[id][1];
-						document.getElementById('other-cite-num-' + id).innerText = this.cite_num[id][0];
-						document.getElementById('self-cite-num-' + id).innerText = this.cite_num[id][1];
+						document.getElementById('cite-refine-' + id).innerText = '完成';
+						document.getElementById('cite-num-' + id).innerText = data.cite_num[id][0] + data.cite_num[id][1];
+						document.getElementById('other-cite-num-' + id).innerText = data.cite_num[id][0];
+						document.getElementById('self-cite-num-' + id).innerText = data.cite_num[id][1];
+					}
+				} else {
+					if( s === 1 ) {
+						document.getElementById(state_key[i] + '-' + id).innerText = '完成';
 					}
 				}
 			})
@@ -165,10 +167,7 @@ class App {
 		})
 
 		message.on('search_states', msg => {
-			console.log(msg.state);
-			this.search_states = msg.state;
-			this.cite_num = msg.cite_num;
-			this.update_render();
+			this.update_render(msg);
 		})
 
 		message.on('save-spider', msg => {
@@ -231,6 +230,7 @@ class App {
 		})
 
 		message.on('done', msg => {
+			this.update_render(msg);
 			console.log( `完成了` + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			app.spider = msg.spider;
 			app.is_start = false;

@@ -49,6 +49,7 @@ class Spider {
 		this.detail_url = `https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com/OutboundService.do?action=go&displayCitedRefs=true&displayTimesCited=true&displayUsageInfo=true&viewType=summary&product=WOS&mark_id=WOS&colName=WOS&search_mode=GeneralSearch&locale=zh_CN&view_name=WOS-summary&sortBy=PY.D%3BLD.D%3BSO.A%3BVL.D%3BPG.A%3BAU.A&mode=outputService&qid=_qid_&SID=${this.sid}&format=formatForPrint&filters=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&selectedIds=1&mark_to=1&mark_from=1&queryNatural=_title_&count_new_items_marked=0&MaxDataSetLimit=&use_two_ets=false&DataSetsRemaining=&IsAtMaxLimit=&IncitesEntitled=yes&value(record_select_type)=pagerecords&markFrom=1&markTo=1&fields_selection=HIGHLY_CITED+HOT_PAPER+OPEN_ACCESS+PMID+USAGEIND+AUTHORSIDENTIFIERS+ACCESSION_NUM+FUNDING+SUBJECT_CATEGORY+JCR_CATEGORY+LANG+IDS+PAGEC+SABBR+CITREFC+ISSN+PUBINFO+KEYWORDS+CITTIMES+ADDRS+CONFERENCE_SPONSORS+DOCTYPE+ABSTRACT+CONFERENCE_INFO+SOURCE+TITLE+AUTHORS++&&&totalMarked=1`; // qid, sid, title
 		this.journal_info_url = `https://www.fenqubiao.com/_journal_`;
 		this.threads = data.threads;
+		this.interval = null;
 
 		message.on('cite-info', msg => {
 			if( msg.info !== 'has-2018-cite' ) {
@@ -88,7 +89,7 @@ class Spider {
 			this.next();
 		})
 
-		setInterval(() => {
+		this.interval = setInterval(() => {
 			if( this.is_start ) {
 				message.send('search_states', {state: this.search_states, cite_num: this.cite_num_arr});
 			}
@@ -301,6 +302,8 @@ class Spider {
 	}
 
 	done() {
+		message.send('done', {state: this.search_states, cite_num: this.cite_num_arr});
+		window.clearInterval(this.interval);
 		let body = document.querySelector('body');
 		this.is_start = false;
 		document.querySelector('body').innerHTML = '';
