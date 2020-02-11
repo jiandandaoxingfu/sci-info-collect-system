@@ -96,14 +96,14 @@ class App {
 			state.forEach( (s, i) => {
 				if( i !== 1 && i !== 4 ) {
 					if( s === 1 || s === -1 ) {
-						let info = s == 1 ? '<span style="color: yellow">进行中</span>' : '<span style="color: red">出错</span>';
+						let info = s == 1 ? '<span style="color: #ffd200;">进行中</span>' : '<span style="color: red">出错</span>';
 						document.getElementById(state_key[i] + '-' + id).innerHTML = info;
 					} else if( s === 2 ) {
 						document.getElementById(state_key[i] + '-' + id).innerHTML = '<span style="color: blue;">完成</span>';
 					}
 				} else if( i === 1) {
 					if( s === 1 || s === -1 ) {
-						let info = s == 1 ? '<span style="color: yellow">进行中</span>' : '<span style="color: red">出错</span>';
+						let info = s == 1 ? '<span style="color: #ffd200;">进行中</span>' : '<span style="color: red">出错</span>';
 						document.getElementById('cite-refine-' + id).innerHTML = info;
 					} else if( s === 2 ) {
 						document.getElementById('cite-refine-' + id).innerHTML = '<span style="color: blue;">完成</span>';
@@ -134,7 +134,9 @@ class App {
 	done() {
 		this.is_start = false;
 		this.cite_tabs_id = [];
-		chrome.tabs.update(app.spider_tab_id, {active: true});
+		setTimeout(() => {
+			chrome.tabs.update(app.spider_tab_id, {active: true});
+		}, 3000);
 	}
 
 	restart() {
@@ -249,7 +251,7 @@ document.addEventListener('click', (e) => {
 	if( e.target.tagName.toLowerCase() === 'button' ) {
 		let action = e.target.innerText;
 		if( action === "开始统计" ) {
-			if( this.is_start ) {
+			if( app.is_start ) {
 				alert('请重新启动或者等待任务完成');
 				return;
 			}

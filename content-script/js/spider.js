@@ -324,7 +324,9 @@ class Spider {
 		body.removeChild(body.querySelector('div[style="page-break-after: always;"]'));
 		console.log('done');
 		console.log(this);
-		alert('已经搜索完成，打印该页面即可。');
+		setTimeout(() => {
+			alert('已经搜索完成，打印该页面即可。');
+		}, 3200);
 	}
 }
 
