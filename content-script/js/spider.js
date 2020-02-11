@@ -91,7 +91,7 @@ class Spider {
 
 		this.interval = setInterval(() => {
 			if( this.is_start ) {
-				message.send('search_states', {state: this.search_states, cite_num: this.cite_num_arr});
+				message.send('search_states', {search_states: this.search_states, cite_num: this.cite_num_arr});
 			}
 		}, 3000);
 
@@ -115,6 +115,7 @@ class Spider {
 					this.qid_arr[id] = res.data.match(/qid=(\d+)/)[1];
 					if( !res.data.includes('<a class="snowplow-times-cited-link"') ) { // 0引用
 						info = 'success & no cite';
+						this.search_states[id][1] = 2;
 					} else {
 						this.refid_arr[id] = res.data.match(/REFID=(\d+)/)[1];   // 此参数应该是参考文献列表查询id，因此0引用，没有此参数。
 					}
@@ -302,7 +303,7 @@ class Spider {
 	}
 
 	done() {
-		message.send('done', {state: this.search_states, cite_num: this.cite_num_arr});
+		message.send('done', {search_states: this.search_states, cite_num: this.cite_num_arr});
 		window.clearInterval(this.interval);
 		let body = document.querySelector('body');
 		this.is_start = false;

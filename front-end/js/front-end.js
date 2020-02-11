@@ -96,31 +96,29 @@ class App {
 			state.forEach( (s, i) => {
 				if( i !== 1 && i !== 4 ) {
 					if( s === 1 || s === -1 ) {
-						let info = s == 1 ? '进行中' : '出错';
-						document.getElementById(state_key[i] + '-' + id).innerText = info;
+						let info = s == 1 ? '<span style="color: yellow">进行中</span>' : '<span style="color: red">出错</span>';
+						document.getElementById(state_key[i] + '-' + id).innerHTML = info;
 					} else if( s === 2 ) {
-						document.getElementById(state_key[i] + '-' + id).innerText = '完成';
+						document.getElementById(state_key[i] + '-' + id).innerHTML = '<span style="color: green;">完成</span>';
 					}
 				} else if( i === 1) {
 					if( s === 1 || s === -1 ) {
-						let info = s == 1 ? '进行中' : '出错';
-						document.getElementById('cite-refine-' + id).innerText = info;
+						let info = s == 1 ? '<span style="color: yellow">进行中</span>' : '<span style="color: red">出错</span>';
+						document.getElementById('cite-refine-' + id).innerHTML = info;
 					} else if( s === 2 ) {
-						document.getElementById('cite-refine-' + id).innerText = '完成';
-						document.getElementById('cite-num-' + id).innerText = data.cite_num[id][0] + data.cite_num[id][1];
-						document.getElementById('other-cite-num-' + id).innerText = data.cite_num[id][0];
-						document.getElementById('self-cite-num-' + id).innerText = data.cite_num[id][1];
+						document.getElementById('cite-refine-' + id).innerHTML = '<span style="color: green;">完成</span>';
+						document.getElementById('cite-num-' + id).innerHTML = data.cite_num[id][0] + data.cite_num[id][1];
+						document.getElementById('other-cite-num-' + id).innerHTML = data.cite_num[id][0];
+						document.getElementById('self-cite-num-' + id).innerHTML = data.cite_num[id][1];
 					}
 				} else {
 					if( s === 1 ) {
-						document.getElementById(state_key[i] + '-' + id).innerText = '完成';
+						document.getElementById(state_key[i] + '-' + id).innerHTML = '<span style="color: green;">完成</span>';
 					}
 				}
 			})
 		})
 	}
-
-
 
 	start() {
 		this.is_start = true;
@@ -131,6 +129,11 @@ class App {
 			this.spider_tab_id = tab.id;
 			this.windowId = tab.windowId;
 		})
+	}
+
+	done() {
+		this.is_start = false;
+		this.cite_tabs_id = [];
 	}
 
 	restart() {
@@ -232,9 +235,7 @@ class App {
 		message.on('done', msg => {
 			this.update_render(msg);
 			console.log( `完成了` + new Date().getMinutes() + ':' + new Date().getSeconds() );
-			app.spider = msg.spider;
-			app.is_start = false;
-			app.cite_tabs_id = [];
+			this.done();
 		})
 	}
 }
