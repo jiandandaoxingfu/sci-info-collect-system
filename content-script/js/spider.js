@@ -55,6 +55,8 @@ class Spider {
 				this.search_states[msg.id][4] = 1;
 				if( msg.info === 'cite-page-error' ) {
 					this.search_states[msg.id][1] = -1;
+				} else {
+					this.search_states[msg.id][1] = 2;
 				}
 				message.send('single-done', {id: msg.id});
 			} else {
@@ -301,7 +303,6 @@ class Spider {
 	done() {
 		let body = document.querySelector('body');
 		this.is_start = false;
-		message.send('done', {spider: spider});
 		document.querySelector('body').innerHTML = '';
 		for(let i=0; i<this.qid_arr.length; i++) {
 			body.innerHTML += `<h2>${i + 1} ： ${this.title_arr[i]}</h2>`;
