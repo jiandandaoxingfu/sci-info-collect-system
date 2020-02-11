@@ -4,6 +4,7 @@ class App {
 
 		this.cite_tabs_id = [];
 		this.spider_tab_id = 0;
+		this.windowId = 0;
 		this.spider = null;
 
 		this.title_arr = [];
@@ -72,6 +73,12 @@ class App {
 
 	name_format(s) {
 		let s2 = s.split('-');
+		for(let s of s2) {
+			if( !s.match(/[a-zA-Z]+/) || s.match(/[a-zA-Z]+/)[0] !== s ) {
+				alert('请检查姓名是否符合要求');
+				return false;
+			}
+		}
 		if( s2.length === 3 ) {
 			this.author_arr = [s.replace(/-/g, ''), s2[0]+s2[1]+s2[2].toLocaleLowerCase(), s2[1]+s2[2]+s2[0], s2[1]+s2[2].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0]+s2[2][0], s2[0]+s2[1][0]+s2[2][0].toLocaleLowerCase(), s2[1][0]+s2[2][0]+s2[0], s2[1][0]+s2[2][0].toLocaleLowerCase()+ s2[0] ];
 		} else if( s2.length === 2 ) {
@@ -105,6 +112,7 @@ class App {
 			url: 'https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com'
 		}, tab => {
 			this.spider_tab_id = tab.id;
+			this.windowId = tab.windowId;
 		})
 	}
 
@@ -114,7 +122,13 @@ class App {
 				chrome.tabs.remove(id);
 			}
 		})
-		chrome.tabs.remove(this.spider_tab_id);
+		chrome.tabs.query({windowId: this.windowId}, (tabs) => {
+			for(let tab of tabs) {
+				if( tab.id == this.spider_tab_id ) {
+					chrome.tabs.remove(this.spider_tab_id);
+				}
+			}
+		})		
 		window.open(window.location.href, '_self');
 	}
 
@@ -182,6 +196,17 @@ class App {
 			this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
 		});
 
+		message.on('error', (msg, tabid) => {
+			if( msg.info === 'server') {
+				console.log('服务器出错');
+			} else {
+				console.log('未知错误：' + msg.url);
+			}
+			message.send(this.spider_tab_id, 'error', {id: this.cite_tabs_id.indexOf(tabid)});
+			chrome.tabs.remove(tabid);
+			this.cite_tabs_id[this.cite_tabs_id.indexOf(tabid)] = '';
+		});
+
 		message.on('single-done', msg => {
 			console.log(  `${msg.id + 1} 完成` + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		})
@@ -197,6 +222,7 @@ class App {
 
 var app = new App();
 app.message_handler();
+app.create_table();
 
 document.addEventListener('click', (e) => {
 	if( e.target.tagName.toLowerCase() === 'button' ) {

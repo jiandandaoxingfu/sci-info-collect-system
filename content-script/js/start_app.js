@@ -1,3 +1,3 @@
 chrome.tabs.create({
-	url: 'app/index.html'
+	url: 'front-end/index.html'
 })

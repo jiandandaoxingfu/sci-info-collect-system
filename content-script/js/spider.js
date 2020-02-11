@@ -85,6 +85,14 @@ class Spider {
 			// 	this.next();
 			// }
 		})
+
+		message.on('error', msg => { 
+			// 一般是引用页面发生错误
+			this.search_states[msg.id][1] = -1;
+			this.search_states[msg.id][4] = 1;
+			message.send('single-done', {id: msg.id});
+			this.next();
+		});
 		
 		console.log('已初始化' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 	}
@@ -362,16 +370,17 @@ message.on('is-start', msg => {
 		spider.get_cite_num = eval(spider.get_cite_num_.replace(/^((\w|_)+)(\(.*?\))/, '$1 = $3 => '));
 		//	eval执行后，函数中this指向window。
 		window.author_arr = spider.author_arr;
-
+		window.stop();
 		let data = body.innerHTML;
-		if( url.match(/CitingArticles.do\?.*?search_mode=CitingArticles/) ) {
-			window.stop();
+		if( url.match(/CitingArticles\.do\?.*?search_mode=CitingArticles/) ) {
 			spider.get_cite_data(data);
-		} else if( url.match(/Search.do\?.*?search_mode=CitingArticles/) ) {
-			window.stop();
+		} else if( url.match(/Search\.do\?.*?search_mode=CitingArticles/) ) {
 			message.send('cite-refine-get-id', {info: ''});
 			spider.get_cite_refine_data(data);
+		} else if( url.match(/summary\.do\?message_key=Server\.internalError/) ) {
+			message.send('error', {info: 'server'});
+		} else if( url.match(/error/i) ) {
+			message.send('error', {info: 'unknown', url: window.location.href});
 		}
-		// https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+summary.do?message_key=Server.internalError&error_display_redirect=true&message_mode=CitingArticles&product=WOS&search_mode=GeneralSearch&qid=13&SID=8EAAMvRzlM7P5AtVsSa#searchErrorMessage
 	})
 })
