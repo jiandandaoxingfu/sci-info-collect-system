@@ -94,7 +94,8 @@
 
 ![](images/test.gif)
 
-###　设计流程图 <img src="images\flowchart.png" style="zoom:100%;" />
+###　设计流程图 
+<img src="images\flowchart.png" style="zoom:100%;" />
 
 ### 第三方库
 
@@ -118,7 +119,8 @@
 
     请发送遇到的问题(建议附上表格截图)至​**e-mail**：jiaminxin@outlook.com。
 
-###　Todos
+
+### Todos
 
 1. 登录中科院分区系统，根据杂志名过去分区信息。
 
