@@ -39,7 +39,7 @@ class Spider {
 		this.search_datas = new Array(n).join(',').split(',');
 		this.cite_refine_datas = new Array(n).join(',').split(',');
 		this.detail_tables = new Array(n).join(',').split(',');
-		this.journal_data = new Array(n).join(',').split(',');
+		this.journal_tables = new Array(n).join(',').split(',');
 
 		this.search_states = new Array(n).join(',').split(',').map( e => [0, 0, 0, 0, 0] ); // search, cite-refine, detail，journal: -1/0/1/2， error/undo/doing/done; is-done: 0/1，undo/done;
 		this.cite_num_arr = new Array(n).join(',').split(',').map( e => [0, 0] );
@@ -72,7 +72,7 @@ class Spider {
 			console.log(msg.id + 1 + ' : ' + '已保存分区数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			if( data !== '' ) {
 				this.search_states[msg.id][3] = 2;
-				this.journal_data[msg.id] = msg.data;
+				this.journal_tables[msg.id] = msg.data;
 			} else {
 				this.search_states[msg.id][3] = -1;
 			}
@@ -261,6 +261,7 @@ class Spider {
 		for(let i=0; i<this.qid_arr.length; i++) {
 			body.innerHTML += `<h2>${i + 1} ： ${this.title_arr[i]}</h2>`;
 			body.innerHTML += this.search_datas[i];
+			body.innerHTML += this.journal_tables[i]
 			body.innerHTML += this.cite_refine_datas[i];
 			body.innerHTML += this.detail_tables[i];
 		}
@@ -283,7 +284,9 @@ class Spider {
 var url = window.location.href;
 var spider = new Spider();
 
-window.stop();
-
 spider.get_sid();
 spider.start();
+
+document.addEventListener('DOMContentLoaded', (e) => {
+	document.body.innerHTML = '<span style="font-size: 50px;">正在运行中...</span>'
+})

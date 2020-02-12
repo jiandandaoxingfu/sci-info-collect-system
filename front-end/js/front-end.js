@@ -25,7 +25,7 @@ class App {
 		let threads = parseInt(document.getElementById('threads').value);
 		let year = document.getElementById('year').value.replace(/，/g, ',').replace(/\s/g, '').split(',');
 		if (title_arr[0] === "" || !this.name_format(author) || year[0] === "") {
-			alert('请输入标题， 年份， 作者');
+			alert('请检查标题， 年份， 作者是否符合要求');
 			return false;
 		} else {
 			this.title_arr = title_arr;
@@ -35,6 +35,24 @@ class App {
 			this.create_table();
 			return true;
 		}
+	}
+
+	name_format(s) {
+		let s2 = s.split('-');
+		for(let s of s2) {
+			if( !s.match(/[a-zA-Z]+/) || s.match(/[a-zA-Z]+/)[0] !== s ) {
+				return false;
+			}
+		}
+		if( s2.length === 3 ) {
+			this.author_arr = [s.replace(/-/g, ''), s2[0]+s2[1]+s2[2].toLocaleLowerCase(), s2[1]+s2[2]+s2[0], s2[1]+s2[2].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0]+s2[2][0], s2[0]+s2[1][0]+s2[2][0].toLocaleLowerCase(), s2[1][0]+s2[2][0]+s2[0], s2[1][0]+s2[2][0].toLocaleLowerCase()+ s2[0] ];
+		} else if( s2.length === 2 ) {
+			this.author_arr = [s.replace(/-/g, ''), s2[0]+s2[1].toLocaleLowerCase(), s2[1]+s2[0], s2[1].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0], s2[0]+s2[1][0].toLocaleLowerCase(), s2[1][0]+s2[0], s2[1][0].toLocaleLowerCase()+ s2[0] ];
+		} else {
+			return false;
+		}
+		this.author_arr = Array.from( new Set(this.author_arr) );
+		return true;
 	}
 
 	create_table() {
@@ -72,25 +90,6 @@ class App {
   					})()}
   				</tbody>
 			</table>`
-	}
-
-	name_format(s) {
-		let s2 = s.split('-');
-		for(let s of s2) {
-			if( !s.match(/[a-zA-Z]+/) || s.match(/[a-zA-Z]+/)[0] !== s ) {
-				alert('请检查姓名是否符合要求');
-				return false;
-			}
-		}
-		if( s2.length === 3 ) {
-			this.author_arr = [s.replace(/-/g, ''), s2[0]+s2[1]+s2[2].toLocaleLowerCase(), s2[1]+s2[2]+s2[0], s2[1]+s2[2].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0]+s2[2][0], s2[0]+s2[1][0]+s2[2][0].toLocaleLowerCase(), s2[1][0]+s2[2][0]+s2[0], s2[1][0]+s2[2][0].toLocaleLowerCase()+ s2[0] ];
-		} else if( s2.length === 2 ) {
-			this.author_arr = [s.replace(/-/g, ''), s2[0]+s2[1].toLocaleLowerCase(), s2[1]+s2[0], s2[1].toLocaleLowerCase()+s2[0], s2[0]+s2[1][0], s2[0]+s2[1][0].toLocaleLowerCase(), s2[1][0]+s2[0], s2[1][0].toLocaleLowerCase()+ s2[0] ];
-		} else {
-			alert('请检查姓名是否符合要求');
-			return false;
-		}
-		return true;
 	}
 
 	update_render(data) {
@@ -139,14 +138,13 @@ class App {
 	table_format(data) {
 		let body = document.createElement('div');
 		body.innerHTML = data;
-		data = body.querySelectorAll('table');
-		if( data[2] ) {
-			body.innerHTML = '';
-			body.appendChild(data[2]);
-			data[2].style.padding = '25px';
-			body.setAttribute('class', 'printWhitePage');
-			return body.innerHTML;
+		let journalDetail = body.querySelector('#detailJournal');
+		if( journalDetail ) {
+			return journalDetail.innerHTML;
+		} else {
+			return '<span>出错了</span>';
 		}
+		
 	}
 
 	start() {
@@ -216,7 +214,7 @@ class App {
 			chrome.tabs.create({
 				active: false,
 				url: msg.url
-			}, (tab) => {
+			}, tab => {
 				this.cite_tabs_id[msg.id] = tab.id;
 			})
 		})

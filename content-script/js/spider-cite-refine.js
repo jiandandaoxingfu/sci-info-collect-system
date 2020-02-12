@@ -3,10 +3,13 @@ class Spider {
 		message.send('author-arr', {});
 
 		message.on('author-arr', msg => {
-			this.get_cite_refine_data();
+			document.addEventListener("DOMContentLoaded", (e) => {
+				window.stop();
+				this.get_cite_refine_data(msg);
+			})
 		})
 	}
-	get_cite_refine_data() {
+	get_cite_refine_data(msg) {
 		// 由于精炼页面时从引用页面自然进来，因此基本不会出错。
 		console.log(msg.author_arr);
 		let ele = document.querySelector('.search-results');
@@ -15,7 +18,7 @@ class Spider {
 			let data = this.get_cite_num(msg.author_arr);
 			message.send('cite-refine-info', {info: true, data: data});	
 		} else {
-			message.send('cite-refine-info', {info: false, data: ''});
+			message.send('cite-refine-info', {info: false, data: {data: '', cite_num: ['', '']}});
 		}
 	}
 
@@ -77,7 +80,3 @@ class Spider {
 var url = window.location.href;
 var spider = new Spider();
 spider.init();
-
-document.addEventListener("DOMContentLoaded", (e) => {
-	window.stop();
-})

@@ -1,5 +1,5 @@
 class Spider {
-	get_cite_data(data) {
+	get_cite_data() {
 		let tr = document.getElementById('PublicationYear_tr');
 		if( tr ) {
 			let has_2018 = document.querySelector('body').innerHTML.includes('PublicationYear_2018');
