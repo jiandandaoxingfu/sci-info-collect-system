@@ -3,7 +3,7 @@
   "manifest_version": 2,
   "version": "1.0.0",
   "author": "JMx",
-  "homepage_url": "http://github.com/jiandandaoxingfu/chrome-extension",
+  "homepage_url": "http://github.com/jiandandaoxingfu/sci-info-collect-system",
   "icons": {
     "16": "icon.png",
     "32": "icon.png",
