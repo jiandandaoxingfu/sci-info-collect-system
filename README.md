@@ -26,11 +26,11 @@
 
 #### 初始状态
 
-![](images/init.png)
+![图片无法加载](images/init.png)
 
 #### 工作状态
 
-![](images/work.png)
+![图片无法加载](images/work.png)
 
 ### 使用教程
 
@@ -38,25 +38,25 @@
 
 首先将插件解压缩
 
-![](images/unzip.gif)
+![图片无法加载](images/unzip.gif)
 
 然后将解压后的插件安装到浏览器。不同浏览器的安装方法如下
 
 **360极速浏览器(测试版本：12.0)**：
 
-![](images/360.gif)
+![图片无法加载](images/360.gif)
 
 **Opera浏览器(测试版本：64.0.3417.61)：**
 
-![](images/opera.gif)
+![图片无法加载](images/opera.gif)
 
 **Chrome浏览器(测试版本：74.0.3729.131)：**
 
-![](images/chrome.gif)
+![图片无法加载](images/chrome.gif)
 
 **QQ浏览器(版本：10.5.2)：**
 
-![](images/qq.gif)
+![图片无法加载](images/qq.gif)
 
 #### 开始使用
 
@@ -92,10 +92,10 @@
 
 #### 整体演示
 
-![](images/test.gif)
+![图片无法加载](images/test.gif)
 
 ### 设计流程图 
-<img src="images/flowchart.png" style="zoom:100%;" />
+![图片无法加载](images/flowchart.png)
 
 ### 第三方库
 
