@@ -17,11 +17,11 @@ class App {
 	}
 
 	input_valid_check() {
-		let title_arr = document.getElementById('title').value.split('&&').map(d => d.replace(/(^\s*)/, ''));
+		let title_arr = document.getElementById('title').value.replace(/(\r\n|\r|\n)/g, ' ').split('&&').map(d => d.replace(/(^\s*)/, ''));
 		let author = document.getElementById('author').value;
 		let threads = parseInt(document.getElementById('threads').value);
 		let year = document.getElementById('year').value.replace(/，/g, ',').replace(/\s/g, '').split(',');
-		if (title_arr[0] === "" || this.name_format(author) || year[0] === "") {
+		if (title_arr[0] === "" || !this.name_format(author) || year[0] === "") {
 			alert('请输入标题， 年份， 作者');
 			return false;
 		} else {

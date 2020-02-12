@@ -1,3 +1,21 @@
+<!-- MarkdownTOC -->
+
+- 科研成果统计系统
+	- 操作界面
+		- 初始状态
+		- 工作状态
+	- 使用教程
+		- 安装插件
+		- 开始使用
+			- 输入
+			- 输出
+		- 整体演示
+	- 设计流程图
+	- 第三方库
+	- Q&A
+	- Todos
+
+<!-- /MarkdownTOC -->
 [TOC]
 
 ## 科研成果统计系统
@@ -8,47 +26,37 @@
 
 #### 初始状态
 
-![](https://cdn.nlark.com/yuque/0/2020/png/122742/1581425381432-0b4eee7c-a2ae-4ed5-a3e9-cc944e758fbe.png)
+![](images\init.png)
 
 #### 工作状态
 
-![](https://cdn.nlark.com/yuque/0/2020/png/122742/1581426417857-3ebda2fe-db50-495d-8d3a-84b61a49b8a3.png)
+![](images\work.png)
 
 ### 使用教程
 
 #### 安装插件
 
-**360极速浏览器(测试版本：12.0)**：将插件文件拖动到360极速浏览器页面内，然后会弹出选项框，点击确定
+首先将插件解压缩
 
-![](https://cdn.nlark.com/yuque/0/2020/png/122742/1581433960468-9fa16fdb-cf43-4424-b679-e25a9cbf89cd.png)
+![](images\unzip.gif)
 
-然后浏览器右上角会出现如下的图标
+然后将解压后的插件安装到浏览器。不同浏览器的安装方法如下
 
-![](https://cdn.nlark.com/yuque/0/2020/png/122742/1581434183513-c71e9ff7-45e3-457a-8201-5c90d866d17f.png)
+**360极速浏览器(测试版本：12.0)**：
 
-此时插件即安装成功，点击图标即可开始使用。
+![](images\360.gif)
 
-**Opera浏览器(测试版本：64.0.3417.61)：**同样拖动插件文件到Opera浏览器页面，然后会弹出如下的提示框
+**Opera浏览器(测试版本：64.0.3417.61)：**
 
-![](https://cdn.nlark.com/yuque/0/2020/png/122742/1581434542119-10c1f061-8233-4d26-9fa0-74092433d85e.png)
+![](images\opera.gif)
 
-点击**转到扩展**，出现下面的页面
+**Chrome浏览器(测试版本：74.0.3729.131)：**
 
-![](https://cdn.nlark.com/yuque/0/2020/png/122742/1581434609345-81d58be1-f3ce-41ff-a09e-7a77ad0ea052.png)
+![](images\chrome.gif)
 
-点击**安装**，即可使用。
+**QQ浏览器(版本：10.5.2)：**
 
-**Chrome浏览器(测试版本：74.0.3729.131)：**首先，将插件文件类型由.crx改为zip，然后解压。然后
-
-打开Chrome浏览器，打开网址：<u>chrome://extensions/</u>，页面如下
-
-![](https://cdn.nlark.com/yuque/0/2020/png/122742/1581435094110-a420bb19-39ad-40d4-9c4b-530ea4060d83.png)
-
-打开开发者模式
-
-![](E:\web\chrome-extension\images\1581435157360.png)
-
-点击**加载已解压的扩展程序**，选择第一步解压的文件所在文件夹即可。
+![](images\qq.gif)
 
 #### 开始使用
 
@@ -82,7 +90,11 @@
 8. 作者顺序：整数。指定姓名在检索结果作者列表中的位置。
 9. 进度：空/完成。
 
-###　设计流程图 ![](https://cdn.nlark.com/yuque/0/2020/png/122742/1581427018282-ca9278cf-cdc1-44ce-9ce0-78aabfd4a293.png)
+#### 整体演示
+
+![](images/test.gif)
+
+###　设计流程图 <img src="images\flowchart.png" style="zoom:100%;" />
 
 ### 第三方库
 
@@ -102,10 +114,12 @@
 
    不可以。由于数据是从[Web of Science](http://apps.webofknowledge.com/)获取，如果该网站更新系统，则软件可能无法正常使用。后续会提供更新。
    
-3. bug提交
+3. **bug提交**
 
-    ::e-mail:jiaminxin@outlook.com.
+    请发送遇到的问题(建议附上表格截图)至​**e-mail**：jiaminxin@outlook.com。
 
 ###　Todos
 
 1. 登录中科院分区系统，根据杂志名过去分区信息。
+
+    由于中科院分区表网站登录时设置了人机验证，因此目前无法后台获取查询权限，需要用户登录来获取查询权限。
