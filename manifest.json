@@ -1,7 +1,7 @@
 {
   "name": "科研成果统计",
   "manifest_version": 2,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "JMx",
   "homepage_url": "http://github.com/jiandandaoxingfu/sci-info-collect-system",
   "icons": {
@@ -14,7 +14,8 @@
   "description": "用于科研成果统计",
   "permissions": [
     "tabs",
-    "https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com*"
+    "https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com*",
+    "https://vpn2.zzu.edu.cn/Core/,DanaInfo=www.fenqubiao.com*"
   ],
 
   "browser_action": {
@@ -32,7 +33,8 @@
   },
 
   "content_scripts": [{
-    "matches": ["https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com*"],
+    // webofscience主窗口
+    "matches": ["https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+UA_GeneralSearch_input.do*"],
     "css": [
         "content-script/css/main.css",
         "content-script/css/source-sans-pro.min.css",
@@ -42,7 +44,46 @@
     "js": [
         "content-script/lib/axios.min.js",
         "content-script/js/message.js",
-        "content-script/js/spider.js"],
+        "content-script/js/spider-main.js"],
+    "run_at": "document_start"
+    }, 
+    // 引用页面
+    {
+    "matches": ["https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+CitingArticles.do*"],
+    "css": [
+        "content-script/css/main.css",
+        "content-script/css/source-sans-pro.min.css",
+        "content-script/css/WoKcommon.css",
+        "content-script/css/WoKcomponents.css",
+        "content-script/css/WoKsummary.css"],
+    "js": [
+        "content-script/js/message.js",
+        "content-script/js/spider-cite.js"],
+    "run_at": "document_start"
+    },
+    // 精炼页面
+     { 
+    "matches": ["https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+Search.do*"], 
+    "css": [
+        "content-script/css/main.css",
+        "content-script/css/source-sans-pro.min.css",
+        "content-script/css/WoKcommon.css",
+        "content-script/css/WoKcomponents.css",
+        "content-script/css/WoKsummary.css"],
+    "js": [
+        "content-script/js/message.js",
+        "content-script/js/spider-cite-refine.js"],
+    "run_at": "document_start"
+    }, 
+    // 期刊分区详情页面
+    {
+    "matches": ["https://vpn2.zzu.edu.cn/Core/,DanaInfo=www.fenqubiao.com*"],
+    "css": [
+        "content-script/css/fenqubiao.css"
+        ], 
+    "js": [
+        "content-script/js/message.js",
+        "content-script/js/spider-fenqubiao.js"],
     "run_at": "document_start"
   }]
 }

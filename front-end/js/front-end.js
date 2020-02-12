@@ -4,8 +4,11 @@ class App {
 
 		this.cite_tabs_id = [];
 		this.spider_tab_id = 0;
+		this.journal_tab_id = 0;
 		this.windowId = 0;
 		this.spider = null;
+
+		this.journal_info_url = `https://vpn2.zzu.edu.cn/Core/,DanaInfo=www.fenqubiao.com+JournalDetail.aspx?y=2019&t=_journal_`;
 
 		this.title_arr = [];
 		this.author_arr = '';
@@ -120,6 +123,32 @@ class App {
 		})
 	}
 
+	get_journal_data(msg) { 
+		console.log(msg.id + 1 + ' : ' + '正在获取期刊分区数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		let journal_info_url = this.journal_info_url.replace('_journal_', msg.journal);
+		axios.get(journal_info_url).then( res => {
+			if( true ) { // 判断是否成功。
+				let data = this.table_format(res.data);
+				message.send(this.spider_tab_id, 'journal-data', {id: msg.id, data: data});
+			} else {
+				message.send(this.spider_tab_id, 'journal-data', {id: msg.id, data: ''});
+			}
+		})
+	}
+
+	table_format(data) {
+		let body = document.createElement('div');
+		body.innerHTML = data;
+		data = body.querySelectorAll('table');
+		if( data[2] ) {
+			body.innerHTML = '';
+			body.appendChild(data[2]);
+			data[2].style.padding = '25px';
+			body.setAttribute('class', 'printWhitePage');
+			return body.innerHTML;
+		}
+	}
+
 	start() {
 		this.is_start = true;
 		chrome.tabs.create({
@@ -129,13 +158,19 @@ class App {
 			this.spider_tab_id = tab.id;
 			this.windowId = tab.windowId;
 		})
+
+		chrome.tabs.create({
+			url: 'https://vpn2.zzu.edu.cn/,DanaInfo=www.fenqubiao.com+'
+		}, tab => {
+			this.journal_tab_id = tab.id;
+		})
 	}
 
 	done() {
 		this.is_start = false;
 		this.cite_tabs_id = [];
 		setTimeout(() => {
-			chrome.tabs.update(app.spider_tab_id, {active: true});
+			chrome.tabs.update(this.spider_tab_id, {active: true});
 		}, 3000);
 	}
 
@@ -176,27 +211,6 @@ class App {
 			this.update_render(msg);
 		})
 
-		message.on('save-spider', msg => {
-			this.spider = msg.spider;
-			console.log( '已保存spider' + new Date().getMinutes() + ':' + new Date().getSeconds() );
-		})
-
-		message.on('get-spider', (msg, tabid) => {
-			message.send(tabid, 'spider', {spider: this.spider});
-		})
-
-		message.on('search-info', msg => {
-			if( msg.info === 'success' ) {
-				console.log( `${msg.id + 1}  搜索成功` + new Date().getMinutes() + ':' + new Date().getSeconds() );
-			} else if( msg.info === 'not unique' ) {
-				console.log( `${msg.id + 1}  搜索结果不唯一` + new Date().getMinutes() + ':' + new Date().getSeconds() );
-			} else if( msg.info === 'success & no cite' ) {
-				console.log( `${msg.id + 1}  搜索完成，0引用` + new Date().getMinutes() + ':' + new Date().getSeconds() );
-			} else if( msg.info === 'not found' ){
-				console.log( `${msg.id + 1}  搜索失败` + new Date().getMinutes() + ':' + new Date().getSeconds() );
-			}
-		});
-
 		message.on('open-cite-page', msg => {
 			if( !this.is_start ) return;
 			chrome.tabs.create({
@@ -204,7 +218,6 @@ class App {
 				url: msg.url
 			}, (tab) => {
 				this.cite_tabs_id[msg.id] = tab.id;
-				console.log( msg.id + 1 + ' : ' + '已经打开引用窗口' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			})
 		})
 
@@ -213,8 +226,15 @@ class App {
 			message.send(this.spider_tab_id, 'cite-info', {id: this.cite_tabs_id.indexOf(tabid), info: msg.info});
 		});
 
+		message.on('get-journal-data', msg => {
+			this.get_journal_data(msg);
+		});
+
+		message.on('author-arr', (msg, tabid) => {
+			message.send(tabid, 'author-arr', {author_arr: this.author_arr});
+		});
+
 		message.on('cite-refine-info', (msg, tabid) => {
-			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : cite-refine-data' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			message.send(this.spider_tab_id, 'cite-refine-info', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data, info: msg.info});
 		});
 
