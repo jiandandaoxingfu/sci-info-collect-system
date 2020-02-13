@@ -126,12 +126,8 @@ class App {
 		console.log(msg.id + 1 + ' : ' + '正在获取期刊分区数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		let journal_info_url = this.journal_info_url + msg.journal;
 		axios.get(journal_info_url).then( res => {
-			if( true ) { // 判断是否成功。
-				let data = this.table_format(res.data);
-				message.send(this.spider_tab_id, 'journal-data', {id: msg.id, data: data});
-			} else {
-				message.send(this.spider_tab_id, 'journal-data', {id: msg.id, data: ''});
-			}
+			let data = this.table_format(res.data);
+			message.send(this.spider_tab_id, 'journal-data', {id: msg.id, data: data});
 		})
 	}
 
@@ -140,9 +136,13 @@ class App {
 		body.innerHTML = data;
 		let journalDetail = body.querySelector('#detailJournal');
 		if( journalDetail ) {
-			return journalDetail.innerHTML;
+			body.innerHTML = '';
+			journalDetail.removeAttribute('id');
+			journalDetail.style.padding = '5px 40px';
+			body.appendChild(journalDetail);
+			return body.innerHTML;
 		} else {
-			return '<span>出错了</span>';
+			return '';
 		}
 		
 	}

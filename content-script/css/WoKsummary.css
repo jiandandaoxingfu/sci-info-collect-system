@@ -2,8 +2,22 @@
 
 span.high-cite {  font-weight: bolder; color: blue;  }
 span.cite-num {  font-weight: bolder; color: red; }
+
+.error {
+	font-size: 30px; 
+	color: red; 
+	text-align: center;
+}
+
+.cite_num_ {
+	font-size: 20px; 
+	color: red; 
+	text-align: center; 
+	margin-bottom: 20px;
+}
+
 @media print {
-	h2 {
+	h2, .error {
 		display: none;
 	}
 }

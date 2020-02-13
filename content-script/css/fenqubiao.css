@@ -1,7 +1,1 @@
-/*
-* @Author:             old jia
-* @Email:              jiaminxin@outlook.com
-* @Date:               2020-02-12 17:55:50
-* @Last Modified by:   old jia
-* @Last Modified time: 2019-05-28 18:36:17
-*/
+#report {border-collapse: collapse;        }        .table tr th {text-align: center;vertical-align: middle;font-size: 12px;        }        .table {margin: 0px;padding: 0px;        }.table tr td {    vertical-align: middle;    text-align: center;}    .table tr td.categgory, .table tr td.title {        vertical-align: middle;        text-align: left;    }        .master {        }        /*用于列表中，两本期刊的辨识*/        .line1 {border-bottom: 2px dashed silver;        }        /*用于查看期刊详细信息时，两本期刊的辨识*/        .line2 {border-top: 2px dashed red;        }        .center {width: 60%;margin: 0 20%;        }        .introduction li + li {margin-top: 10px;        }        .impactfactor th, .impactfactor td, .category th, .detail th {text-align: center;        }        .labelCss {text-align: right;width: 15%;        }        .valueCss {text-align: left;width: 35%;        }        /**分区*/        .section {background-color: silver;color: white;font-weight: 700;text-align: center;        }        /**top期刊*/        .top {background-color: silver;color: white;font-weight: 700;text-align: center;        }        /**学科*/        .category {text-align: left;        }        .title {font-weight: 600;color: blue;text-align: left;        }        /**宽度*/        .width-10 {width: 10%;        }        .width-20 {width: 20%;        }        /*期刊详细信息里面的学科表*/        #categorylist {margin: 0px;        }        /*期刊详细信息里面的影响因子表*/        #impactfactorlist {margin: 0px;        }        a:link {text-decoration: none;        }

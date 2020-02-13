@@ -220,7 +220,7 @@ class Spider {
 		if( data[2] ) {
 			body.innerHTML = '';
 			body.appendChild(data[2]);
-			data[2].style.padding = '25px';
+			data[2].style.margin = '50px';
 			body.setAttribute('class', 'printWhitePage');
 			return body.innerHTML;
 		}
@@ -256,24 +256,46 @@ class Spider {
 		message.send('done', {search_states: this.search_states, cite_num: this.cite_num_arr});
 		window.clearInterval(this.interval);
 		let body = document.querySelector('body');
+		body.innerHTML = '';
 		this.is_start = false;
-		document.querySelector('body').innerHTML = '';
-		for(let i=0; i<this.qid_arr.length; i++) {
+		this.search_states.forEach( (state, i) => {
 			body.innerHTML += `<h2>${i + 1} ： ${this.title_arr[i]}</h2>`;
-			body.innerHTML += this.search_datas[i];
-			body.innerHTML += this.journal_tables[i]
-			body.innerHTML += this.cite_refine_datas[i];
-			body.innerHTML += this.detail_tables[i];
-		}
-		[...body.children].forEach( child => {
-			if( child.tagName.toLowerCase() !== 'h2' ) {
-				let page_break = document.createElement('div');
-				page_break.setAttribute('style', 'page-break-after: always;');
-				body.insertBefore(page_break, child);
+			if( state[0] === 2 ) {
+				body.innerHTML += this.search_datas[i];
+				if( state[1] === 2 ) {
+					body.innerHTML += `<div class="cite_num_">自引：${this.cite_num_arr[i][1]}，&nbsp;&nbsp;&nbsp; 被引：${this.cite_num_arr[i][0]}</div>`;
+				}
+				if( state[3] === 2 ) {
+					body.innerHTML += this.journal_tables[i];
+				} else if( state[3] === -1 ) {
+					body.innerHTML += '<div class="error">获取期刊分区出错了。</div>';
+				}
+				body.innerHTML += '<div style="page-break-after: always;"></div>';
+			} else {
+				body.innerHTML += '<div class="error">搜索出错了。</div>';
 			}
-		});
+		})
+
+		this.search_states.forEach( (state, i) => {
+			if( state[1] === 2 ) {
+				body.innerHTML += `<h3>${i + 1} ： ${this.title_arr[i]}</h3>`;				
+				body.innerHTML += `<div class="cite_num_">总引用量：${ this.cite_num_arr[i][0] + this.cite_num_arr[i][1] }/div>`;
+				body.innerHTML += this.cite_refine_datas[i];
+				body.innerHTML += '<div style="page-break-after: always;"></div>';			
+			} else if( state[1] === -1 ){
+				body.innerHTML += '<div class="error">获取引用数据出错了。</div>';
+			}
+			if( state[2] === 2 ) {
+				body.innerHTML += this.detail_tables[i];
+				body.innerHTML += '<div style="page-break-after: always;"></div>';
+			} else if( state[2] === -1 ) {
+				body.innerHTML += '<div class="error">获取详情页数据出错了。</div>';
+			}
+			
+		})
+
 		body.querySelectorAll('span.label').forEach( e => e.setAttribute('class', '') );
-		body.removeChild(body.querySelector('div[style="page-break-after: always;"]'));
+		window.stop();
 		console.log('done');
 		console.log(this);
 		setTimeout(() => {
@@ -289,5 +311,5 @@ spider.get_sid();
 spider.start();
 
 document.addEventListener('DOMContentLoaded', (e) => {
-	document.body.innerHTML = '<span style="font-size: 50px;">正在运行中...</span>'
+	document.body.innerHTML = '<br><br><div style="font-size: 50px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印即可。<br><span style="font-size: 20px; color: red;">(如果并未使用插件，请关闭插件，否则会影响正常使用。)</span></div><br><br><br><br>';
 })

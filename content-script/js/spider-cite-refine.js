@@ -3,19 +3,27 @@ class Spider {
 		message.send('author-arr', {});
 
 		message.on('author-arr', msg => {
-			document.addEventListener("DOMContentLoaded", (e) => {
-				window.stop();
-				this.get_cite_refine_data(msg);
-			})
+			this.author_arr = msg.author_arr;
+			this.interval = setInterval( (e) => {
+				if( document.body ) {
+					let result = document.body.innerHTML.replace(/(\r|\r\n|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/);
+					if( result ) {
+						window.clearInterval(this.interval);
+						window.stop();
+						console.log('准备获取数据并发送');
+						this.get_cite_refine_data();
+					}
+				}
+			}, 100);
 		})
 	}
-	get_cite_refine_data(msg) {
+
+	get_cite_refine_data() {
 		// 由于精炼页面时从引用页面自然进来，因此基本不会出错。
-		console.log(msg.author_arr);
 		let ele = document.querySelector('.search-results');
 		if( ele ) {
 			this.data_format(ele);
-			let data = this.get_cite_num(msg.author_arr);
+			let data = this.get_cite_num();
 			message.send('cite-refine-info', {info: true, data: data});	
 		} else {
 			message.send('cite-refine-info', {info: false, data: {data: '', cite_num: ['', '']}});
@@ -56,7 +64,7 @@ class Spider {
 		})
 	}
 
-	get_cite_num(author_arr) {
+	get_cite_num() {
 		let body = document.body;
 		let self_cite_num = 0, other_cite_num = 0;
 		body.querySelectorAll('.search-results-content').forEach( author_div => {
@@ -64,8 +72,8 @@ class Spider {
 			author_div.children[1].querySelectorAll('a').forEach( a => {
 				authors.push( a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
     		})
-    		let author_union = new Set([...authors, ...author_arr]);
-    		if( author_union.size === (authors.length + author_arr.length) ) {
+    		let author_union = new Set([...authors, ...this.author_arr]);
+    		if( author_union.size === (authors.length + this.author_arr.length) ) {
     			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>被引</span>`;
 				other_cite_num += 1;
     		} else {
@@ -77,6 +85,5 @@ class Spider {
 	}
 }
 
-var url = window.location.href;
 var spider = new Spider();
 spider.init();
