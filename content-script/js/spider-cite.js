@@ -16,10 +16,13 @@ class Spider {
 	}
 }
 
-var spider = new Spider();
-
-document.addEventListener("DOMContentLoaded", (e) => {
-	console.log('dom ready');
-	window.stop();
-	spider.get_cite_data();
+message.send('is-start', {});
+message.on('is-start', () => {
+	var spider = new Spider();
+	
+	document.addEventListener("DOMContentLoaded", (e) => {
+		console.log('dom ready');
+		window.stop();
+		spider.get_cite_data();
+	})
 })

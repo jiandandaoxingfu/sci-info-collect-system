@@ -7,12 +7,7 @@ class Spider {
 var url = window.location.href;
 var spider = new Spider();
 
-// document.addEventListener("DOMContentLoaded", (e) => {
-// 	console.log(url);
-// 	if( url.includes('CategoryList.aspx') ) {
-// 		window.stop();
-// 		message.send('fenqubiao', {info: true})
-// 	} else if( url.includes('') ) {
-
-// 	}
-// })
+message.send('is-start', {});
+message.on('is-start', () => {
+	alert('目前无法后台获取权限，需要用户登录来获取查询期刊分区权限。');
+})

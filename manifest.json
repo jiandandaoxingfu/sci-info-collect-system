@@ -1,7 +1,7 @@
 {
   "name": "科研成果统计",
   "manifest_version": 2,
-  "version": "2.0.0",
+  "version": "1.0.0",
   "author": "JMx",
   "homepage_url": "http://github.com/jiandandaoxingfu/sci-info-collect-system",
   "icons": {
@@ -15,7 +15,8 @@
   "permissions": [
     "tabs",
     "https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com*",
-    "http://www.fenqubiao.com/*"
+    "http://www.fenqubiao.com/*",
+    "https://api.github.com/repos/jiandandaoxingfu/sci-info-collect-system/releases"
   ],
 
   "browser_action": {
@@ -67,7 +68,7 @@
     }, 
     // 期刊分区详情页面
     {
-    "matches": ["http://www.fenqubiao.com/*"],
+    "matches": ["http://www.fenqubiao.com/"],
     "js": [
         "content-script/js/message.js",
         "content-script/js/spider-fenqubiao.js"],

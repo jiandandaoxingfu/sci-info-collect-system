@@ -1,6 +1,7 @@
 class App {
 	constructor() {
 		this.is_start = false;
+		this.lastest_version = 'v1.0.0';
 
 		this.cite_tabs_id = [];
 		this.spider_tab_id = 0;
@@ -17,6 +18,22 @@ class App {
 		this.table_header = ['#', '标题', '检索页', '引用页', '引用量', '他引量', '自引量', '详情页', '期刊分区页', '作者顺序', '进度'];
 		this.header_en = {'#': 'num', '标题': 'title', '检索页': 'search', '引用页': 'cite-refine', '引用量': 'cite-num', '他引量': 'other-cite-num', 
 			'自引量': 'self-cite-num', '详情页': 'detail', '期刊分区页': 'journal', '作者顺序': 'order', '进度': 'process'};
+	}
+
+	check_update() {
+		let release_url = 'https://api.github.com/repos/jiandandaoxingfu/sci-info-collect-system/releases';
+		axios.get(release_url).then( (res) => {
+			if( res.data[0] ) {
+				let tag_name = res.data[0].tag_name;
+				if( tag_name !== this.lastest_version ) {
+					if( confirm('有最新版本，是否前往下载？') ) {
+						window.location.href = 'https://github.com/jiandandaoxingfu/sci-info-collect-system/releases/tag/' + tag_name;
+					}
+				} else {
+					console.log('不需要更新。');
+				}
+			}
+		})
 	}
 
 	input_valid_check() {
@@ -158,7 +175,7 @@ class App {
 		})
 
 		chrome.tabs.create({
-			url: 'https://vpn2.zzu.edu.cn/,DanaInfo=www.fenqubiao.com+'
+			url: 'http://www.fenqubiao.com'
 		}, tab => {
 			this.journal_tab_id = tab.id;
 		})
@@ -169,7 +186,7 @@ class App {
 		this.cite_tabs_id = [];
 		setTimeout(() => {
 			chrome.tabs.update(this.spider_tab_id, {active: true});
-		}, 3000);
+		}, 6000);
 	}
 
 	restart() {
@@ -191,7 +208,8 @@ class App {
 	message_handler() {
 		message.on('is-start', (msg, tabid) => {
 			let is_related_tabid = tabid == this.spider_tab_id ||
-											this.cite_tabs_id.indexOf(tabid) > -1;
+											this.cite_tabs_id.indexOf(tabid) > -1 ||
+											this.journal_tab_id;
 			if(this.is_start && is_related_tabid) {
 				message.send(tabid, 'is-start', {info: ''});
 			}
@@ -233,7 +251,8 @@ class App {
 		});
 
 		message.on('cite-refine-info', (msg, tabid) => {
-			message.send(this.spider_tab_id, 'cite-refine-info', {id: this.cite_tabs_id.indexOf(tabid), data: msg.data, info: msg.info});
+			msg.id = this.cite_tabs_id.indexOf(tabid);
+			message.send(this.spider_tab_id, 'cite-refine-info', msg);
 		});
 
 		message.on('error', (msg, tabid) => {
@@ -260,6 +279,7 @@ class App {
 }
 
 var app = new App();
+app.check_update();
 app.message_handler();
 app.create_table();
 

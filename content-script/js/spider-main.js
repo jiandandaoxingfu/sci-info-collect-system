@@ -85,8 +85,8 @@ class Spider {
 
 		message.on('cite-refine-info', msg => {
 			this.search_states[msg.id][1] = 2;
-			this.cite_refine_datas[msg.id] = msg.data.data;
-			this.cite_num_arr[msg.id] = msg.data.cite_num;
+			this.cite_refine_datas[msg.id] = msg.data;
+			this.cite_num_arr[msg.id] = msg.cite_num;
 			console.log(msg.id + 1 + ' : ' + '已保存引用数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			if( !this.search_states[msg.id].includes(1) ) { // 这个标题完成了
 				this.search_states[msg.id][4] = 1;
@@ -278,10 +278,13 @@ class Spider {
 
 		this.search_states.forEach( (state, i) => {
 			if( state[1] === 2 ) {
-				body.innerHTML += `<h3>${i + 1} ： ${this.title_arr[i]}</h3>`;				
-				body.innerHTML += `<div class="cite_num_">总引用量：${ this.cite_num_arr[i][0] + this.cite_num_arr[i][1] }/div>`;
-				body.innerHTML += this.cite_refine_datas[i];
-				body.innerHTML += '<div style="page-break-after: always;"></div>';			
+				let cite_num = this.cite_num_arr[i][0] + this.cite_num_arr[i][1];
+				if( cite_num > 0 ) {
+					body.innerHTML += `<h3>${i + 1} ： ${this.title_arr[i]}</h3>`;				
+					body.innerHTML += `<div class="cite_num_">总引用量：${ cite_num }</div>`;
+					body.innerHTML += this.cite_refine_datas[i];
+					body.innerHTML += '<div style="page-break-after: always;"></div>';
+				}
 			} else if( state[1] === -1 ){
 				body.innerHTML += '<div class="error">获取引用数据出错了。</div>';
 			}
@@ -291,7 +294,6 @@ class Spider {
 			} else if( state[2] === -1 ) {
 				body.innerHTML += '<div class="error">获取详情页数据出错了。</div>';
 			}
-			
 		})
 
 		body.querySelectorAll('span.label').forEach( e => e.setAttribute('class', '') );
@@ -300,16 +302,19 @@ class Spider {
 		console.log(this);
 		setTimeout(() => {
 			alert('已经搜索完成，打印该页面即可。');
-		}, 3200);
+		}, 6200);
 	}
 }
 
-var url = window.location.href;
-var spider = new Spider();
-
-spider.get_sid();
-spider.start();
-
-document.addEventListener('DOMContentLoaded', (e) => {
-	document.body.innerHTML = '<br><br><div style="font-size: 50px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印即可。<br><span style="font-size: 20px; color: red;">(如果并未使用插件，请关闭插件，否则会影响正常使用。)</span></div><br><br><br><br>';
+message.send('is-start', {});
+message.on('is-start', () => {
+	var url = window.location.href;
+	var spider = new Spider();
+	
+	spider.get_sid();
+	spider.start();
+	
+	document.addEventListener('DOMContentLoaded', (e) => {
+		document.body.innerHTML = '<br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<br></div><br><br><br><br>';
+	})
 })

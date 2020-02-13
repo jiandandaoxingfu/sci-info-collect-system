@@ -23,15 +23,15 @@ class Spider {
 		let ele = document.querySelector('.search-results');
 		if( ele ) {
 			this.data_format(ele);
-			let data = this.get_cite_num();
-			message.send('cite-refine-info', {info: true, data: data});	
+			let msg = this.get_cite_num();
+			message.send('cite-refine-info', msg);	
 		} else {
-			message.send('cite-refine-info', {info: false, data: {data: '', cite_num: ['', '']}});
+			message.send('cite-refine-info', {info: false, data: '', cite_num: [0, 0] });
 		}
 	}
 
 	data_format(ele) {
-		ele.style.padding = '25px';
+		ele.style.padding = '0 25px';
 		let body = document.body;
 		body.innerHTML = '';
 		body.appendChild(ele);
@@ -81,9 +81,12 @@ class Spider {
 				self_cite_num += 1;
     		}
 		})
-		return {data: body.innerHTML, cite_num: [other_cite_num, self_cite_num]};
+		return { info: true, data: body.innerHTML, cite_num: [other_cite_num, self_cite_num] };
 	}
 }
 
-var spider = new Spider();
-spider.init();
+message.send('is-start', {});
+message.on('is-start', () => {
+	var spider = new Spider();
+	spider.init();
+})
