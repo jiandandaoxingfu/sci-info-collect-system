@@ -272,6 +272,7 @@ class Spider {
 				body.insertBefore(page_break, child);
 			}
 		});
+		body.querySelectorAll('span.label').forEach( e => e.setAttribute('class', '') );
 		body.removeChild(body.querySelector('div[style="page-break-after: always;"]'));
 		console.log('done');
 		console.log(this);

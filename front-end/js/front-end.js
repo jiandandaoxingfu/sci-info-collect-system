@@ -8,7 +8,7 @@ class App {
 		this.windowId = 0;
 		this.spider = null;
 
-		this.journal_info_url = `https://vpn2.zzu.edu.cn/Core/,DanaInfo=www.fenqubiao.com+JournalDetail.aspx?y=2019&t=_journal_`;
+		this.journal_info_url = `http://www.fenqubiao.com/Core/JournalDetail.aspx?y=2019&t=`;
 
 		this.title_arr = [];
 		this.author_arr = '';
@@ -124,7 +124,7 @@ class App {
 
 	get_journal_data(msg) { 
 		console.log(msg.id + 1 + ' : ' + '正在获取期刊分区数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
-		let journal_info_url = this.journal_info_url.replace('_journal_', msg.journal);
+		let journal_info_url = this.journal_info_url + msg.journal;
 		axios.get(journal_info_url).then( res => {
 			if( true ) { // 判断是否成功。
 				let data = this.table_format(res.data);
@@ -249,13 +249,11 @@ class App {
 			let tabid = this.cite_tabs_id[msg.id];
 			if( tabid !== '' ) chrome.tabs.remove(tabid);
 			this.cite_tabs_id[msg.id] = '';
-			console.log(`${msg.id + 1}：完成` + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			message.send(this.spider_tab_id, 'next', {});
 		})
 
 		message.on('done', msg => {
 			this.update_render(msg);
-			console.log( `完成了` + new Date().getMinutes() + ':' + new Date().getSeconds() );
 			this.done();
 		})
 	}
