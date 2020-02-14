@@ -21,8 +21,6 @@ message.on('is-start', () => {
 	var spider = new Spider();
 	
 	document.addEventListener("DOMContentLoaded", (e) => {
-		console.log('dom ready');
-		window.stop();
 		spider.get_cite_data();
 	})
 })

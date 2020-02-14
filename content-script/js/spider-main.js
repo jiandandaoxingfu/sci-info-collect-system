@@ -310,11 +310,13 @@ message.send('is-start', {});
 message.on('is-start', () => {
 	var url = window.location.href;
 	var spider = new Spider();
+	document.write(`'<br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<br><span style="font-size: 30px; color: red;">使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br></div><br><br><br><br>';`);
+	window.stop();
 	
 	spider.get_sid();
 	spider.start();
 	
-	document.addEventListener('DOMContentLoaded', (e) => {
-		document.body.innerHTML = '<br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<span style="font-size: 20px; color: red;">使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br></div><br><br><br><br>';
-	})
+	// document.addEventListener('DOMContentLoaded', (e) => {
+	// 	document.body.innerHTML = '<br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<br><span style="font-size: 30px; color: red;">使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br></div><br><br><br><br>';
+	// })
 })
