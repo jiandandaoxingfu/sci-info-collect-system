@@ -1,89 +1,59 @@
-Modulation instability and dynamics for the Hermitian symmetric space derivative nonlinear Schrodinger equation, 0引用， Geng Xianguo.
+1.
+N-Soliton Solution and Soliton Resonances for the (2+1)-Dimensional Inhomogeneous Gardner Equation
+作者: Wang, Xin; Geng, Xian-Guo
+COMMUNICATIONS IN THEORETICAL PHYSICS  
+被引频次: 1
 
-Periodic and rational solutions of the reduced Maxwell-Bloch equations, 31, Geng Xianguo, 13个2018引用。
+2.
+Inverse Scattering Transform of the Coupled Sasa-Satsuma Equation by Riemann-Hilbert Approach
+作者: Wu, Jian-Ping; Geng, Xian-Guo
+COMMUNICATIONS IN THEORETICAL PHYSICS 
+被引频次: 5
 
-soliton,
+3.
+Three-Component Generalisation of Burgers Equation and Its Bi-Hamiltonian Structures
+作者: Liu, Wei; Geng, Xianguo; Xue, Bo
+ZEITSCHRIFT FUR NATURFORSCHUNG SECTION A-A JOURNAL OF PHYSICAL SCIENCES  
+被引频次: 0
 
-Dynamics of mixed lump-solitary waves of an extended (2+1)-dimensional shallow water wave model， 2018 0引用
+4.
+Algebro-geometric constructions of quasi-periodic flows of the Newell hierarchy and applications
+作者: Geng, Xianguo; Wang, Hui
+IMA JOURNAL OF APPLIED MATHEMATICS 
+被引频次: 3
 
-Lump and interaction solutions to the (2+1)-dimensional Burgers equation，  wanghui， 2018 3引用.
+5.
+APPLICATION OF THE TRIGONAL CURVE TO THE BLASZAK-MARCINIAK LATTICE HIERARCHY
+作者: Geng, Xianguo; Zeng, Xin
+THEORETICAL AND MATHEMATICAL PHYSICS 
+被引频次: 2
 
-Group invariant solutions to a centro-affine invariant flow， 0引用
+6.
+Application of the trigonal curve to the Blaszak&ndash;Marciniak lattice hierarchy
+作者: Geng, Xianguo; Zeng, Xin
+Theoretical and Mathematical Physics  
+被引频次: 0
 
-Riemann-Hilbert approach for multisoliton solutions of generalized coupled fourth-order nonlinear Schrodinger equations， 0 引用
+7.
+Integrable couplings of fractional L-hierarchy and its Hamiltonian structures
+作者: Wu, Jingzhu; Xing, Xiuzhi; Geng, Xianguo
+MATHEMATICAL METHODS IN THE APPLIED SCIENCES
+被引频次: 0
 
----------------,
+8.
+Initial-boundary problems for the vector modified Korteweg-de Vries equation via Fokas unified transform method
+作者: Liu, Huan; Geng, Xianguo
+JOURNAL OF MATHEMATICAL ANALYSIS AND APPLICATIONS
+被引频次: 13
 
-Phenotypic and Genotypic Characterization of Streptomycin-Resistant Multidrug-Resistant Mycobacterium tuberculosis Clinical Isolates in Southern China， 0引用，
+9.
+The application of trigonal curve to the Mikhailov-Shabat-Sokolov flows
+作者: He, Guoliang; Geng, Xianguo; Wu, Lihua
+ZEITSCHRIFT FUR ANGEWANDTE MATHEMATIK UND PHYSIK
+被引频次: 0
 
-Inverse scattering transform and soliton classification of the coupled modified Korteweg-de Vries equation， 15引用，耿献国，2018 4个引用
-
-Backlund transformations, rational solutions and soliton-cnoidal wave solutions of the modified Kadomtsev-Petviashvili equation， 10引用，2018 0引用，
-
-Reduced nuclear translocation of serum response factor is associated with skeletal muscle atrophy in a cigarette smoke-induced mouse model of COPD， 8引用， 2018 4引用，
-
-Integrability aspects and multi-soliton solutions of a new coupled Gerdjikov-Ivanov derivative nonlinear Schrodinger equation， 2引用， 2018 0引用
-
-peakon， 
-
-soliton,
-
-BICENTENNIAL OF THE GREAT PONCELET THEOREM (1813-2013): CURRENT ADVANCES 11 引用， 2018 1引用
-
-RhBMP-2 loaded 3D-printed mesoporous silica/calcium phosphate cement porous scaffolds with enhanced vascularization and osteogenesis properties 25 引用， 2018 11引用
-
-Full Poncelet Theorem in Minkowski dS and AdS Spaces， 5引用， 2018 0引用
-
-Transplantation of Mesenchymal Stem Cells Attenuates Pulmonary Hypertension by Normalizing the Endothelial-to-Mesenchymal Transition， 1引用， 2018 0引用
-
-Applications of dispersive analytical wave solutions of nonlinear seventh order Lax and Kaup-Kupershmidt dynamical wave equations， 1引用， 2018 0引用
-
-system, 
-
-A Simple Proof of Poncelet's Theorem (on the Occasion of Its Bicentennial), 9 引用， 2018 3引用
-
-The Great Emch Closure Theorem and a combinatorial proof of Poncelet's Theorem， 1引用， 2018 1引用
-
-Nanocements produced from mesoporous bioactive glass nanoparticles， 16引用， 2018 3引用
-
-
-
-
-
-
-
-
-
- [2, 0, 0, 0, 1]  1: v
- [2, 2, 2, 2, 1]  2: v
- [-1, 0, 0, 0, 1]  3: v
- [2, 0, 0, 0, 1]  4: v
-[2, 2, 2, 2, 1]  5: v
-[2, 0, 0, 0, 1]  6: v
-[2, 0, 0, 0, 1]  7: v
-[-1, 0, 0, 0, 1]  8: v 
-[2, 0, 0, 0, 1]  9: v
-[2, 2, 2, 2, 1]  10: v
-[2, 0, 0, 0, 1]  11: v
-[-1, 0, 0, 0, 1]  12: 
-[2, 0, 0, 0, 1]  13: v
-[-1, 0, 0, 0, 1]  14: v
-[-1, 0, 0, 0, 1]  15: v
-[2, 2, 2, 2, 1]  16: v
-[2, 2, 2, 2, 1]  17: v
-[2, 0, 0, 0, 1]  18: v
-[2, 0, 0, 0, 1]  19: v
-[2, 0, 0, 0, 1]  20: v
-[-1, 0, 0, 0, 1]  21: v
-[2, 2, 2, 2, 1]  22: v
-[2, 2, 2, 2, 1]  23: v
-[2, 2, 2, 2, 1] 24: v
-
-
-
-
-
-
-
- Modulation instability and dynamics for the Hermitian symmetric space derivative nonlinear Schrodinger equation &&  Periodic and rational solutions of the reduced Maxwell-Bloch equations &&  soliton &&  Dynamics of mixed lump-solitary waves of an extended (2+1)-dimensional shallow water wave model &&  Lump and interaction solutions to the (2+1)-dimensional Burgers equation &&  Group invariant solutions to a centro-affine invariant flow &&  Riemann-Hilbert approach for multisoliton solutions of generalized coupled fourth-order nonlinear Schrodinger equations &&  --------------- &&  Phenotypic and Genotypic Characterization of Streptomycin-Resistant Multidrug-Resistant Mycobacterium tuberculosis Clinical Isolates in Southern China &&  Inverse scattering transform and soliton classification of the coupled modified Korteweg-de Vries equation &&  Backlund transformations rational solutions and soliton-cnoidal wave solutions of the modified Kadomtsev-Petviashvili equation &&  Reduced nuclear translocation of serum response factor is associated with skeletal muscle atrophy in a cigarette smoke-induced mouse model of COPD &&  Integrability aspects and multi-soliton solutions of a new coupled Gerdjikov-Ivanov derivative nonlinear Schrodinger equation &&  peakon &&  soliton &&  BICENTENNIAL OF THE GREAT PONCELET THEOREM (1813-2013): CURRENT ADVANCES  &&  RhBMP-2 loaded 3D-printed mesoporous silica/calcium phosphate cement porous scaffolds with enhanced vascularization and osteogenesis properties &&  Full Poncelet Theorem in Minkowski dS and AdS Spaces &&  Transplantation of Mesenchymal Stem Cells Attenuates Pulmonary Hypertension by Normalizing the Endothelial-to-Mesenchymal Transition &&  Applications of dispersive analytical wave solutions of nonlinear seventh order Lax and Kaup-Kupershmidt dynamical wave equations &&  system &&  A Simple Proof of Poncelet's Theorem (on the Occasion of Its Bicentennial) &&  The Great Emch Closure Theorem and a combinatorial proof of Poncelet's Theorem Nanocements produced from mesoporous bioactive glass nanoparticles && Lump and interaction solutions to the (2+1)-dimensional Burgers equation && Integrability aspects and multi-soliton solutions of a new coupled Gerdjikov-Ivanov derivative nonlinear Schrodinger equation
-
+10.
+Quasi-periodic solutions to the hierarchy of four-component Toda lattices
+作者: Wei, Jiao; Geng, Xianguo; Zeng, Xin
+JOURNAL OF GEOMETRY AND PHYSICS
+被引频次: 7
