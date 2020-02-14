@@ -268,7 +268,7 @@ class App {
 			let tabid = this.cite_tabs_id[msg.id];
 			if( tabid !== '' ) chrome.tabs.remove(tabid);
 			this.cite_tabs_id[msg.id] = '';
-			message.send(this.spider_tab_id, 'next', {});
+			message.send(this.spider_tab_id, 'next', {id: msg.id});
 		})
 
 		message.on('done', msg => {

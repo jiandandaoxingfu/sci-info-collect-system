@@ -51,6 +51,17 @@ class Spider {
 		this.threads = data.threads;
 		this.interval = null;
 
+		for( let i=0; i<n; i++ ) {
+			let div = document.createElement(div);
+			div.setAttribute('id', `div-${i}-part1`);
+			document.body.appendChild(div);
+		}
+		for( let i=0; i<n; i++ ) {
+			let div = document.createElement(div);
+			div.setAttribute('id', `div-${i}-part2`);
+			document.body.appendChild(div);
+		}
+
 		message.on('cite-info', msg => {
 			if( msg.info !== 'has-2018-cite' ) {
 				this.search_states[msg.id][4] = 1;
@@ -102,6 +113,7 @@ class Spider {
 		});
 
 		message.on('next', msg => {
+			this.render(this.search_states, msg.id);
 			this.next();
 		})
 
@@ -252,57 +264,54 @@ class Spider {
 		}
 	}
 
+	render(state, i) {
+		let div = document.querySelector(`#div-${i}-part1`);
+		div.innerHTML += `<h2>${i + 1} ： ${this.title_arr[i]}</h2>`;
+		if( state[0] === 2 ) {
+			div.innerHTML += this.search_datas[i];
+			if( state[1] === 2 ) {
+				div.innerHTML += `<div class="cite_num_">自引：${this.cite_num_arr[i][1]}，&nbsp;&nbsp;&nbsp; 被引：${this.cite_num_arr[i][0]}</div>`;
+			}
+			if( state[3] === 2 ) {
+				div.innerHTML += this.journal_tables[i];
+			} else if( state[3] === -1 ) {
+				div.innerHTML += '<div class="error">获取期刊分区出错了。</div>';
+			}
+			div.innerHTML += '<div style="page-break-after: always;"></div>';
+		} else {
+			div.innerHTML += '<div class="error">搜索出错了。</div>';
+		}
+		div = document.querySelector(`#div-${i}-part2`);
+		if( state[1] === 2 ) {
+			let cite_num = this.cite_num_arr[i][0] + this.cite_num_arr[i][1];
+			if( cite_num > 0 ) {
+				div.innerHTML += `<h3>${i + 1} ： ${this.title_arr[i]}</h3>`;				
+				div.innerHTML += `<div class="cite_num_">总引用量：${ cite_num }</div>`;
+				div.innerHTML += this.cite_refine_datas[i];
+				div.innerHTML += '<div style="page-break-after: always;"></div>';
+			}
+		} else if( state[1] === -1 ){
+			div.innerHTML += '<div class="error">获取引用数据出错了。</div>';
+		}
+		if( state[2] === 2 ) {
+			div.innerHTML += this.detail_tables[i];
+			div.innerHTML += '<div style="page-break-after: always;"></div>';
+		} else if( state[2] === -1 ) {
+			div.innerHTML += '<div class="error">获取详情页数据出错了。</div>';
+		}
+		div.querySelectorAll('span.label').forEach( e => e.setAttribute('class', '') );
+	}
+
 	done() {
 		message.send('done', {search_states: this.search_states, cite_num: this.cite_num_arr});
 		window.clearInterval(this.interval);
-		let body = document.querySelector('body');
-		body.innerHTML = '';
+		document.body.removeChild( document.querySelector('#message') );
 		this.is_start = false;
-		this.search_states.forEach( (state, i) => {
-			body.innerHTML += `<h2>${i + 1} ： ${this.title_arr[i]}</h2>`;
-			if( state[0] === 2 ) {
-				body.innerHTML += this.search_datas[i];
-				if( state[1] === 2 ) {
-					body.innerHTML += `<div class="cite_num_">自引：${this.cite_num_arr[i][1]}，&nbsp;&nbsp;&nbsp; 被引：${this.cite_num_arr[i][0]}</div>`;
-				}
-				if( state[3] === 2 ) {
-					body.innerHTML += this.journal_tables[i];
-				} else if( state[3] === -1 ) {
-					body.innerHTML += '<div class="error">获取期刊分区出错了。</div>';
-				}
-				body.innerHTML += '<div style="page-break-after: always;"></div>';
-			} else {
-				body.innerHTML += '<div class="error">搜索出错了。</div>';
-			}
-		})
-
-		this.search_states.forEach( (state, i) => {
-			if( state[1] === 2 ) {
-				let cite_num = this.cite_num_arr[i][0] + this.cite_num_arr[i][1];
-				if( cite_num > 0 ) {
-					body.innerHTML += `<h3>${i + 1} ： ${this.title_arr[i]}</h3>`;				
-					body.innerHTML += `<div class="cite_num_">总引用量：${ cite_num }</div>`;
-					body.innerHTML += this.cite_refine_datas[i];
-					body.innerHTML += '<div style="page-break-after: always;"></div>';
-				}
-			} else if( state[1] === -1 ){
-				body.innerHTML += '<div class="error">获取引用数据出错了。</div>';
-			}
-			if( state[2] === 2 ) {
-				body.innerHTML += this.detail_tables[i];
-				body.innerHTML += '<div style="page-break-after: always;"></div>';
-			} else if( state[2] === -1 ) {
-				body.innerHTML += '<div class="error">获取详情页数据出错了。</div>';
-			}
-		})
-
-		body.querySelectorAll('span.label').forEach( e => e.setAttribute('class', '') );
-		window.stop();
 		console.log('done');
 		console.log(this);
 		setTimeout(() => {
 			alert('已经搜索完成，打印该页面即可。');
-		}, 6200);
+		}, 1000);
 	}
 }
 
@@ -310,13 +319,9 @@ message.send('is-start', {});
 message.on('is-start', () => {
 	var url = window.location.href;
 	var spider = new Spider();
-	document.write(`'<br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<br><span style="font-size: 30px; color: red;">使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br></div><br><br><br><br>';`);
+	document.write(`'<div id='message'><br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<br><span style="font-size: 30px; color: red;">使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br></div><br><br><br><br></div>`);
 	window.stop();
 	
 	spider.get_sid();
 	spider.start();
-	
-	// document.addEventListener('DOMContentLoaded', (e) => {
-	// 	document.body.innerHTML = '<br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<br><span style="font-size: 30px; color: red;">使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br></div><br><br><br><br>';
-	// })
 })
