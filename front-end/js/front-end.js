@@ -186,7 +186,7 @@ class App {
 		this.cite_tabs_id = [];
 		setTimeout(() => {
 			chrome.tabs.update(this.spider_tab_id, {active: true});
-		}, 6000);
+		}, 800);
 	}
 
 	restart() {

@@ -52,12 +52,12 @@ class Spider {
 		this.interval = null;
 
 		for( let i=0; i<n; i++ ) {
-			let div = document.createElement(div);
+			let div = document.createElement('div');
 			div.setAttribute('id', `div-${i}-part1`);
 			document.body.appendChild(div);
 		}
 		for( let i=0; i<n; i++ ) {
-			let div = document.createElement(div);
+			let div = document.createElement('div');
 			div.setAttribute('id', `div-${i}-part2`);
 			document.body.appendChild(div);
 		}
@@ -113,7 +113,7 @@ class Spider {
 		});
 
 		message.on('next', msg => {
-			this.render(this.search_states, msg.id);
+			this.render(this.search_states[msg.id], msg.id);
 			this.next();
 		})
 
@@ -265,6 +265,9 @@ class Spider {
 	}
 
 	render(state, i) {
+		if( document.querySelector('#message') ) {
+			document.body.removeChild( document.querySelector('#message') );
+		}
 		let div = document.querySelector(`#div-${i}-part1`);
 		div.innerHTML += `<h2>${i + 1} ： ${this.title_arr[i]}</h2>`;
 		if( state[0] === 2 ) {
@@ -281,6 +284,8 @@ class Spider {
 		} else {
 			div.innerHTML += '<div class="error">搜索出错了。</div>';
 		}
+		div.querySelectorAll('span.label').forEach( e => e.setAttribute('class', '') );
+
 		div = document.querySelector(`#div-${i}-part2`);
 		if( state[1] === 2 ) {
 			let cite_num = this.cite_num_arr[i][0] + this.cite_num_arr[i][1];
@@ -305,7 +310,6 @@ class Spider {
 	done() {
 		message.send('done', {search_states: this.search_states, cite_num: this.cite_num_arr});
 		window.clearInterval(this.interval);
-		document.body.removeChild( document.querySelector('#message') );
 		this.is_start = false;
 		console.log('done');
 		console.log(this);
@@ -319,7 +323,8 @@ message.send('is-start', {});
 message.on('is-start', () => {
 	var url = window.location.href;
 	var spider = new Spider();
-	document.write(`'<div id='message'><br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<br><span style="font-size: 30px; color: red;">使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br></div><br><br><br><br></div>`);
+	document.title = '结果显示页面';
+	document.write(`<div id='message'><br><br><div style="font-size: 40px; width: 100%; text-align: center;">正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>任务完成后，数据会显示在该页面，打印或导出为pdf即可。<br><span style="font-size: 30px; color: red;">使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br></div><br><br><br><br></div>`);
 	window.stop();
 	
 	spider.get_sid();
