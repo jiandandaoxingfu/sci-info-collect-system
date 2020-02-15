@@ -1,7 +1,7 @@
 {
   "name": "科研成果统计",
   "manifest_version": 2,
-  "version": "1.0.0",
+  "version": "2.0.0",
   "author": "JMx",
   "homepage_url": "http://github.com/jiandandaoxingfu/sci-info-collect-system",
   "icons": {
@@ -14,7 +14,7 @@
   "description": "用于科研成果统计",
   "permissions": [
     "tabs",
-    "https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com*",
+    "https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com/*",
     "http://www.fenqubiao.com/*",
     "https://api.github.com/repos/jiandandaoxingfu/sci-info-collect-system/releases"
   ],
@@ -45,25 +45,8 @@
         "content-script/css/fenqubiao.css",
         "content-script/css/bootstrap.min.css"],
     "js": [
-        "content-script/lib/axios.min.js",
         "content-script/js/message.js",
-        "content-script/js/spider-main.js"],
-    "run_at": "document_start"
-    }, 
-    // 引用页面
-    {
-    "matches": ["https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+CitingArticles.do*"],
-    "js": [
-        "content-script/js/message.js",
-        "content-script/js/spider-cite.js"],
-    "run_at": "document_start"
-    },
-    // 精炼页面
-     { 
-    "matches": ["https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+Search.do*"], 
-    "js": [
-        "content-script/js/message.js",
-        "content-script/js/spider-cite-refine.js"],
+        "content-script/js/after-end.js"],
     "run_at": "document_start"
     }, 
     // 期刊分区详情页面
@@ -71,7 +54,7 @@
     "matches": ["http://www.fenqubiao.com/"],
     "js": [
         "content-script/js/message.js",
-        "content-script/js/spider-fenqubiao.js"],
+        "content-script/js/fenqubiao.js"],
     "run_at": "document_start"
   }]
 }
