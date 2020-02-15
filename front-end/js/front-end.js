@@ -2,13 +2,14 @@ class App {
 	constructor() {
 		this.is_start = false;
 		this.lastest_version = 'v1.0.0';
-		this.interval = null;
 
 		this.cite_tabs_id = [];
-		this.after_end_tab_id = 0;
+		this.spider_tab_id = 0;
 		this.journal_tab_id = 0;
 		this.windowId = 0;
 		this.spider = null;
+
+		this.journal_info_url = `http://www.fenqubiao.com/Core/JournalDetail.aspx?y=2019&t=`;
 
 		this.title_arr = [];
 		this.author_arr = '';
@@ -108,8 +109,8 @@ class App {
 			</table>`
 	}
 
-	update_render() {
-		this.spider.search_states.forEach((state, id) => {
+	update_render(data) {
+		data.search_states.forEach((state, id) => {
 			let state_key = ['search', 'cite-refine', 'detail', 'journal', 'process'];
 			state.forEach( (s, i) => {
 				if( i !== 1 && i !== 4 ) {
@@ -125,9 +126,9 @@ class App {
 						document.getElementById('cite-refine-' + id).innerHTML = info;
 					} else if( s === 2 ) {
 						document.getElementById('cite-refine-' + id).innerHTML = '<span style="color: blue;">完成</span>';
-						document.getElementById('cite-num-' + id).innerHTML = this.spider.cite_num_arr[id][0] + this.spider.cite_num_arr[id][1];
-						document.getElementById('other-cite-num-' + id).innerHTML = this.spider.cite_num_arr[id][0];
-						document.getElementById('self-cite-num-' + id).innerHTML = this.spider.cite_num_arr[id][1];
+						document.getElementById('cite-num-' + id).innerHTML = data.cite_num[id][0] + data.cite_num[id][1];
+						document.getElementById('other-cite-num-' + id).innerHTML = data.cite_num[id][0];
+						document.getElementById('self-cite-num-' + id).innerHTML = data.cite_num[id][1];
 					}
 				} else {
 					if( s === 1 ) {
@@ -136,18 +137,40 @@ class App {
 				}
 			})
 		})
-		if( !this.spider.is_start ) {
-			this.done();
-		}
 	}
 
-	init() {
+	get_journal_data(msg) { 
+		console.log(msg.id + 1 + ' : ' + '正在获取期刊分区数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		let journal_info_url = this.journal_info_url + msg.journal;
+		axios.get(journal_info_url).then( res => {
+			let data = this.table_format(res.data);
+			message.send(this.spider_tab_id, 'journal-data', {id: msg.id, data: data});
+		})
+	}
+
+	table_format(data) {
+		let body = document.createElement('div');
+		body.innerHTML = data;
+		let journalDetail = body.querySelector('#detailJournal');
+		if( journalDetail ) {
+			body.innerHTML = '';
+			journalDetail.removeAttribute('id');
+			journalDetail.style.padding = '5px 40px';
+			body.appendChild(journalDetail);
+			return body.innerHTML;
+		} else {
+			return '';
+		}
+		
+	}
+
+	start() {
 		this.is_start = true;
 		chrome.tabs.create({
 			active: false,
 			url: 'https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com'
 		}, tab => {
-			this.after_end_tab_id = tab.id;
+			this.spider_tab_id = tab.id;
 			this.windowId = tab.windowId;
 		})
 
@@ -158,30 +181,24 @@ class App {
 		})
 	}
 
-	start() {
-		let spider = new Spider();
-		spider.init(this.title_arr, this.author_arr, this.threads, this.sid, this.after_end_tab_id);
-		this.spider = spider;
-		spider.start();
-		this.interval = setInterval( () => {
-			this.update_render();
-		}, 4000);
-	}
-
 	done() {
 		this.is_start = false;
-		window.clearInterval(this.interval);
 		this.cite_tabs_id = [];
 		setTimeout(() => {
-			chrome.tabs.update(this.after_end_tab_id, {active: true});
-		}, 1000);
+			chrome.tabs.update(this.spider_tab_id, {active: true});
+		}, 800);
 	}
 
 	restart() {
+		this.cite_tabs_id.forEach( id => {
+			if( id  !== '' ) {
+				chrome.tabs.remove(id);
+			}
+		})
 		chrome.tabs.query({windowId: this.windowId}, (tabs) => {
 			for(let tab of tabs) {
-				if( tab.id == this.after_end_tab_id ) {
-					chrome.tabs.remove(this.after_end_tab_id);
+				if( tab.id == this.spider_tab_id ) {
+					chrome.tabs.remove(this.spider_tab_id);
 				}
 			}
 		})		
@@ -190,7 +207,8 @@ class App {
 
 	message_handler() {
 		message.on('is-start', (msg, tabid) => {
-			let is_related_tabid = tabid == this.after_end_tab_id ||
+			let is_related_tabid = tabid == this.spider_tab_id ||
+											this.cite_tabs_id.indexOf(tabid) > -1 ||
 											this.journal_tab_id;
 			if(this.is_start && is_related_tabid) {
 				message.send(tabid, 'is-start', {info: ''});
@@ -201,9 +219,61 @@ class App {
 			if( !msg.info ) {
 				alert('无法获取web of science权限，请检查是否具有使用其权限。一般而言要使用校园网');
 			} else {
-				this.sid = msg.sid;
-				this.start();
+				message.send(tabid, 'init-data', {title_arr: this.title_arr, author_arr: this.author_arr, threads: this.threads});
 			}
+		})
+
+		message.on('search_states', msg => {
+			this.update_render(msg);
+		})
+
+		message.on('open-cite-page', msg => {
+			if( !this.is_start ) return;
+			chrome.tabs.create({
+				active: false,
+				url: msg.url
+			}, tab => {
+				this.cite_tabs_id[msg.id] = tab.id;
+			})
+		})
+
+		message.on('cite-info', (msg, tabid) => {
+			console.log( this.cite_tabs_id.indexOf(tabid) + 1 + ' : ' + msg.info + new Date().getMinutes() + ':' + new Date().getSeconds() );
+			message.send(this.spider_tab_id, 'cite-info', {id: this.cite_tabs_id.indexOf(tabid), info: msg.info});
+		});
+
+		message.on('get-journal-data', msg => {
+			this.get_journal_data(msg);
+		});
+
+		message.on('author-arr', (msg, tabid) => {
+			message.send(tabid, 'author-arr', {author_arr: this.author_arr});
+		});
+
+		message.on('cite-refine-info', (msg, tabid) => {
+			msg.id = this.cite_tabs_id.indexOf(tabid);
+			message.send(this.spider_tab_id, 'cite-refine-info', msg);
+		});
+
+		message.on('error', (msg, tabid) => {
+			if( msg.info === 'server') {
+				console.log(this.cite_tabs_id.indexOf(tabid) + 1 + '：' + '服务器出错');
+			} else {
+				console.log(this.cite_tabs_id.indexOf(tabid) + 1 + '：' + '未知错误：' + msg.url);
+			}
+			message.send(this.spider_tab_id, 'error', {id: this.cite_tabs_id.indexOf(tabid)});
+		});
+
+		message.on('single-done', msg => {
+			let tabid = this.cite_tabs_id[msg.id];
+			if( tabid !== '' ) chrome.tabs.remove(tabid);
+			this.cite_tabs_id[msg.id] = '';
+			message.send(this.spider_tab_id, 'next', {id: msg.id});
+		})
+
+		message.on('done', msg => {
+			this.update_render(msg);
+			this.done();
 		})
 	}
 }
@@ -222,7 +292,7 @@ document.addEventListener('click', (e) => {
 				return;
 			}
 			if( app.input_valid_check() ) {
-				app.init();
+				app.start();
 			}
 		} else if( action === "重新启动" ) {
 			app.restart();
