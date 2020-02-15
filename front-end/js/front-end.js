@@ -11,8 +11,8 @@ class App {
 		this.spider = null;
 
 		this.title_arr = [];
-		this.author_arr = '';
-		this.year = '';
+		this.author_arr = [];
+		this.year_arr = [];
 		this.threads = 3;
 		this.table_header = ['#', '标题', '检索页', '引用页', '引用量', '他引量', '自引量', '详情页', '期刊分区页', '作者顺序', '进度'];
 		this.header_en = {'#': 'num', '标题': 'title', '检索页': 'search', '引用页': 'cite-refine', '引用量': 'cite-num', '他引量': 'other-cite-num', 
@@ -39,13 +39,13 @@ class App {
 		let title_arr = document.getElementById('title').value.replace(/(\r\n|\r|\n)/g, ' ').split('&&').map(d => d.replace(/(^\s*)/, ''));
 		let author = document.getElementById('author').value;
 		let threads = parseInt(document.getElementById('threads').value);
-		let year = document.getElementById('year').value.replace(/，/g, ',').replace(/\s/g, '').split(',');
-		if (title_arr[0] === "" || !this.name_format(author) || year[0] === "") {
+		let year_arr = document.getElementById('year').value.replace(/，/g, ',').replace(/\s/g, '').split(',');
+		if (title_arr[0] === "" || !this.name_format(author) || year_arr.filter( year => year.match(/^20\d\d$/) ).length == 0 ) {
 			alert('请检查标题， 年份， 作者是否符合要求');
 			return false;
 		} else {
 			this.title_arr = title_arr;
-			this.year = year;
+			this.year_arr = year_arr.map( y => parseInt(y) );
 			this.threads = threads;
 			this.cite_tabs_id = new Array(title_arr.length).join(',').split(',');
 			this.create_table();
@@ -160,7 +160,7 @@ class App {
 
 	start() {
 		let spider = new Spider();
-		spider.init(this.title_arr, this.author_arr, this.threads, this.sid, this.after_end_tab_id);
+		spider.init(this.title_arr, this.author_arr, this.year_arr, this.threads, this.sid, this.after_end_tab_id);
 		this.spider = spider;
 		spider.start();
 		this.interval = setInterval( () => {
