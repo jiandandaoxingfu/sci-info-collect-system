@@ -34,6 +34,9 @@ class App {
 			}
 		}).catch( e => {
 			console.log( '查询更新失败：' + e );
+			setTimeout( () => {
+				this.check_update();
+			}, 5000);
 		} )
 	}
 
