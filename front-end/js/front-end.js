@@ -32,7 +32,9 @@ class App {
 					console.log('不需要更新。');
 				}
 			}
-		})
+		}).catch( e => {
+			console.log( '查询更新失败：' + e );
+		} )
 	}
 
 	input_valid_check() {
@@ -141,7 +143,7 @@ class App {
 		}
 	}
 
-	init() {
+	open_tab() {
 		this.is_start = true;
 		chrome.tabs.create({
 			active: false,
@@ -222,7 +224,7 @@ document.addEventListener('click', (e) => {
 				return;
 			}
 			if( app.input_valid_check() ) {
-				app.init();
+				app.open_tab();
 			}
 		} else if( action === "重新启动" ) {
 			app.restart();

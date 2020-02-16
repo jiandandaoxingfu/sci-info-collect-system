@@ -14,6 +14,9 @@ function init(n) {
 		div.setAttribute('id', `div-${i}-part1`);
 		document.body.appendChild(div);
 	}
+	
+	document.body.innerHTML += '<div style="page-break-after: always;"></div>';
+
 	for( let i=0; i<n; i++ ) {
 		let div = document.createElement('div');
 		div.setAttribute('id', `div-${i}-part2`);
