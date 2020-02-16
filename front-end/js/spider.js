@@ -72,58 +72,108 @@ class Spider {
 		})
 	}
 
-	async get_cite_data(id) {
+	get_cite_data(id) {
 		console.log(id + 1 + ' : ' + '正在获取引用文献' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		this.search_states[id][1] = 1;
 		let cite_url = this.cite_url.replace('_qid_', this.qid_arr[id])
 			.replace('_refid_', this.refid_arr[id]);
-		let res = await axios.get(cite_url);
-		let data = res.data.replace(/(\r\n|\r|\n)/g, '');
-		let records = data.match(/id="RECORD_\d+/g);
-		if( records ) { 
-			// 判断引用文献中是否含有所需年份内发表的，如果有，计算出最大引用量：即所需最小年份以后的引用量,从而确定爬取页数。
-			let year_num = data.match(/\d{4}\s\(\d+\)<\/label>/g);
-			let year_arr = year_num.map( s => parseInt( s.slice(0, 4) ) );
-			let num_arr = year_num.map( s => parseInt( s.slice(6, 8) ));
-			let intersect = this.year_arr.filter( y => year_arr.includes(y) );
-			if( intersect.length > 0 ) {
-				let min_intersect_year = Math.min(...intersect);
-				let index = year_arr.indexOf(min_intersect_year);
-				let sum = 0;
-				for(let i=0; i<=index; i++) {
-					sum += num_arr[i];
-				}
-				data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];
-				if( sum < 26 && sum > 11 ) {
-					let cite_50_url = this.cite_50_url.replace('_qid_', this.qid_arr[id] + 1)
-							.replace('_size_', 25);
-					let res = await axios.get(cite_50_url);
-					data += res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/g)[1];
+		return axios.get(cite_url).then( res => {
+			let data = res.data.replace(/(\r\n|\r|\n)/g, '');
+			let record_num = data.match(/id="RECORD_\d+/g).length; // 0, <=10, <=25, <=50
+			console.log(record_num);
+			if( record_num > 0 ) {
+				// 判断引用文献中是否含有所需年份内发表的，如果有，计算出最大引用量：即所需最小年份以后的引用量,从而确定爬取页数。
+				let year_and_num = data.match(/\d{4}\s\(\d+\)<\/label>/g);
+				let year_arr = year_and_num.map( s => parseInt( s.slice(0, 4) ) );
+				let num_arr = year_and_num.map( s => parseInt( s.slice(6, 8) ));
+				let intersect = this.year_arr.filter( y => year_arr.includes(y) );
+				if( intersect.length > 0 ) {
+					let min_intersect_year = Math.min(...intersect);
+					let index = year_arr.indexOf(min_intersect_year);
+					let sum = num_arr.slice(0, index + 1).reduce( (i, j) => i+j );
+					data = data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/);
+					data = 
+					return [record_num, num, data];
 				} else {
-					let pages = Math.floor(sum/50);
-					let cite_50_url = this.cite_50_url.replace('_qid_', this.qid_arr[id] + 1)
-							.replace('_size_', 50);
-					res = await axios.get(cite_50_url);
-					data += res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/g)[1];
-					for(let i=0; i<pages; i++) {
-						let next_page_url = res.data.match(/class="paginationNext.*?href="(.*?)"/)[1].replace(/amp;/g, '');
-						res = await axios.get(next_page_url);
-						let matches = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/g);
-						data += matches[0] + matches[1];
-					}
+					this.search_states[id][1] = 2;
+					this.search_states[id][4] = 1;
 				}
-				let ele = this.refine_cite_data(data);
-				data = this.get_cite_num(ele, id);
-				this.cite_refine_datas[id] = this.search_result_format(data);
-				this.search_states[id][1] = 2;
 			} else {
-				this.search_states[id][1] = 2;
+				this.search_states[id][1] = -1;
 				this.search_states[id][4] = 1;
 			}
+			return '';
+		})
+	}
+
+	async get_cite_refine_data(record_num, sum, data) {
+		if( record_num >= sum ) {
+			data = data.reduce( (i, j) => i+j );
 		} else {
-			this.search_states[id][1] = -1;
-			this.search_states[id][4] = 1;
+			data = await this.get_more_cite_data();
 		}
+		data = this.search_result_format(data);
+		let ele = this.refine_cite_data(data);
+		[this.cite_refine_datas[id], this.cite_num_arr[id]] = this.get_cite_num(ele);
+	}
+	async get_more_cite_data(data, sum) {
+		if( sum < 26 && sum > 11 ) {
+			let cite_50_url = this.cite_50_url.replace('_qid_', this.qid_arr[id] + 1)
+					.replace('_size_', 25);
+			let res = await axios.get(cite_50_url);
+			data += res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/g)[1];
+		} else {
+			let pages = Math.floor(sum/50);
+			let cite_50_url = this.cite_50_url.replace('_qid_', this.qid_arr[id] + 1)
+					.replace('_size_', 50);
+			res = await axios.get(cite_50_url);
+			data += res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/g)[1];
+			for(let i=0; i<pages; i++) {
+				let next_page_url = res.data.match(/class="paginationNext.*?href="(.*?)"/)[1].replace(/amp;/g, '');
+				res = await axios.get(next_page_url);
+				let matches = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/g);
+				data += matches[0] + matches[1];
+			}
+		}
+	}
+
+	refine_cite_data(data) {
+		let body = document.createElement('div');
+		let div = document.createElement('div');
+		let sub_div = document.createElement('div');
+		sub_div.setAttribute('class', 'search-results');
+		div.appendChild(sub_div);
+		body.innerHTML = data;
+		let id_arr = data.match(/RECORD_\d+/g);
+		for( let id of id_arr ) {
+			let ele = body.querySelector(`#${id}`);
+			let year = ele.innerHTML.replace(/(\r|\n|\r\n)/g, '').match(/出版年.*?(\d{4})/);
+			if( year ) {
+				if( this.year_arr.includes( parseInt(year[1]) ) ) {
+					sub_div.appendChild(ele);
+				}
+			} // 未出版的不考虑。
+		}
+		return div;
+	}
+
+	get_cite_num(body) {
+		let self_cite_num = 0, other_cite_num = 0;
+		body.querySelectorAll('.search-results-content').forEach( author_div => {
+			let authors = [];
+			author_div.children[1].querySelectorAll('a').forEach( a => {
+				authors.push( a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
+    		})
+    		let author_union = new Set([...authors, ...this.author_arr]);
+    		if( author_union.size === (authors.length + this.author_arr.length) ) {
+    			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>被引</span>`;
+				other_cite_num += 1;
+    		} else {
+    			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>自引</span>`;
+				self_cite_num += 1;
+    		}
+		})
+		return [body.innerHTML, [other_cite_num, self_cite_num]];
 	}
 
 	get_detail_data(id) {
@@ -193,46 +243,6 @@ class Spider {
 		return body.innerHTML;
 	}
 
-	refine_cite_data(data) {
-		let body = document.createElement('div');
-		let div = document.createElement('div');
-		let sub_div = document.createElement('div');
-		sub_div.setAttribute('class', 'search-results');
-		div.appendChild(sub_div);
-		body.innerHTML = data;
-		let id_arr = data.match(/RECORD_\d+/g);
-		for( let id of id_arr ) {
-			let ele = body.querySelector(`#${id}`);
-			let year = ele.innerHTML.replace(/(\r|\n|\r\n)/g, '').match(/出版年.*?(\d{4})/);
-			if( year ) {
-				if( this.year_arr.includes( parseInt(year[1]) ) ) {
-					sub_div.appendChild(ele);
-				}
-			} // 未出版的不考虑。
-		}
-		return div;
-	}
-
-	get_cite_num(body, id) {
-		let self_cite_num = 0, other_cite_num = 0;
-		body.querySelectorAll('.search-results-content').forEach( author_div => {
-			let authors = [];
-			author_div.children[1].querySelectorAll('a').forEach( a => {
-				authors.push( a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
-    		})
-    		let author_union = new Set([...authors, ...this.author_arr]);
-    		if( author_union.size === (authors.length + this.author_arr.length) ) {
-    			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>被引</span>`;
-				other_cite_num += 1;
-    		} else {
-    			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>自引</span>`;
-				self_cite_num += 1;
-    		}
-		})
-		this.cite_num_arr[id] = [other_cite_num, self_cite_num];
-		return body.innerHTML;
-	}
-
 	detail_table_format(data) {
 		let body = document.createElement('div');
 		body.innerHTML = data;
@@ -268,36 +278,28 @@ class Spider {
 		}
 	}
 
-	crawl(id) {
+	async crawl(id) {
 		console.log(`${id + 1} : 个开始运行` + new Date().getMinutes() + ':' + new Date().getSeconds() );
-		this.get_search_data(id).then( () => {
+		await this.get_search_data(id);
 		if( this.search_states[id][0] == 2 && this.search_states[id][4] == 0 ) {
-			this.get_cite_data(id).then( () => {
-			if( this.search_states[id][1] === 2 && this.search_states[id][4] === 0 ) {
-				this.get_detail_data(id).then( () => {
-				if( !this.search_states[id].includes(1) ) {
-					this.search_states[id][4] = 1;
+			this.get_cite_data(id).then( res => {
+				if( res !== '' ) {
+					await Promise.all[
+						this.get_detail_data(id);
+						this.get_journal_data(id);
+						this.get_cite_refine_data(res);
+					];
+					this.render(id);
+					this.next();
+				} else {
 					this.render(id);
 					this.next();
 				}
-				});
-				this.get_journal_data(id).then( () => {
-				if( !this.search_states[id].includes(1) ) {
-					this.search_states[id][4] = 1;
-					this.render(id);
-					this.next();
-				}
-				});
-			} else if( this.search_states[id][4] == 1 ) {
-				this.render(id);
-				this.next();
-			}
 			});
 		} else if( this.search_states[id][4] == 1 ) {
 			this.render(id);
 			this.next();
 		}
-		})
 	}
 
 	next() {
