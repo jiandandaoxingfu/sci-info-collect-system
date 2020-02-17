@@ -1,7 +1,7 @@
 class App {
 	constructor() {
 		this.is_start = false;
-		this.lastest_version = 'v1.0.0';
+		this.lastest_version = 'v2.0.0';
 		this.interval = null;
 		this.tic = 0;
 		this.toc = 0;
