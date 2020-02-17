@@ -135,6 +135,10 @@ class Spider {
 
 	async next_cite_page(data, id) {
 		let next_page_url = data.match(/class="paginationNext.*?href="(.*?)"/)[1].replace(/amp;/g, '');
+		if( !next_page_url.includes('https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+summary.do') ) {
+			this.search_states[id][1] = -1;
+			return ['', ''];
+		}
 		let res = await axios.get(next_page_url)
 			.catch( e => {
 				console.log(id + 1 + ' ：下一页-网络错误：' + e);
@@ -186,7 +190,7 @@ class Spider {
 	}
 
 	async get_detail_data(id) {
-		console.log(id + 1 + ' : 正在抓取详情页' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log(id + 1 + ' : 正在获取详情页数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		this.search_states[id][2] = 1;
 		let detail_url = this.detail_url.replace('_qid_', this.search_qid_arr[id])
 			.replace('_title_', this.title_arr[id]);
