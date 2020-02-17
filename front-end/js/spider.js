@@ -34,7 +34,7 @@ class Spider {
 	}
 
 	async get_search_data(id) {
-		console.log(id + 1 + ' : 正在搜索' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 正在搜索' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		this.search_states[id][0] = 1;
 		let search_url = this.search_url.replace('_title_', this.title_arr[id]);
 		await axios.get(search_url).then( res => {
@@ -43,6 +43,12 @@ class Spider {
 			if( records ) {
 				if( records.length === 1 ) {
 					info = 'success';
+					
+					let content = body.querySelector('.search-results-content');
+					let authors = Array.from( content.children[1].querySelectorAll('a') )
+									   .map( a => a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
+    				this.author_order[id] = authors.indexOf(intersect[0]);
+
 					this.search_states[id][0] = 2;
 					let data = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];
 					this.journal_arr[id] = data.match(/<value>(.*?)<\/value>/)[1];
@@ -67,22 +73,22 @@ class Spider {
 				this.search_states[id][4] = 1;
 			}
 
-			console.log( id + 1 + ' : 已经完成搜索-' + info + new Date().getMinutes() + ':' + new Date().getSeconds() );
+			console.log((id + 1 + '').padEnd(3, ' ') + ' : 已经完成搜索-' + info + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		}).catch( e => {
-			console.log(id + 1 + ' : 搜索-网络错误：' + e);
+			console.log((id + 1 + '').padEnd(3, ' ') + ' : 搜索-网络错误：' + e);
 			this.search_states[id][4] = 1;
 			this.search_states[id][0] = -1;
 		})
 	}
 
 	async get_cite_data(id) {
-		console.log(id + 1 + ' : 正在获取引用文献' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 正在获取引用文献' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		this.search_states[id][1] = 1;
 		let cite_url = this.cite_url.replace('_qid_', this.search_qid_arr[id])
 			.replace('_refid_', this.refid_arr[id]);
 		let res = await axios.get(cite_url)
 			.catch( e => {
-				console.log(id + 1 + ' : 引用-网络错误：' + e);
+				console.log((id + 1 + '').padEnd(3, ' ') + ' : 引用-网络错误：' + e);
 				this.search_states[id][1] = -1;
 				this.search_states[id][4] = 1;
 				return false;
@@ -112,13 +118,12 @@ class Spider {
 	}
 
 	async get_cite_refine_data(record_num, sum, res_data, id) {
-		console.log(id + 1 + ' : 正在精炼文献' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 正在精炼文献' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		let data = res_data.match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/g);
 		data = data.reduce( (i, j) => i+j );
 		let data_ = '';
 		if( record_num < sum ) {
 			let pages = Math.floor( (sum - 1) / record_num);
-			console.log(id + 1 + ' : record_num: ' + record_num + ', pages: ' + pages);
 			for( let i=0; i<pages; i++ ) {
 				[data_, res_data] = await this.next_cite_page(res_data, id);
 				if( data_ == '' ) return;
@@ -130,7 +135,7 @@ class Spider {
 		let ele = this.refine_cite_data(data);
 		[this.cite_refine_datas[id], this.cite_num_arr[id]] = this.get_cite_num(ele);
 		this.search_states[id][1] = 2;
-		console.log(id + 1 + ' : 已经完成精炼数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 已经完成精炼数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 	}
 
 	async next_cite_page(data, id) {
@@ -141,7 +146,7 @@ class Spider {
 		}
 		let res = await axios.get(next_page_url)
 			.catch( e => {
-				console.log(id + 1 + ' ：下一页-网络错误：' + e);
+				console.log((id + 1 + '').padEnd(3, ' ') + ' ：下一页-网络错误：' + e);
 				this.search_states[id][1] = -1;
 				return false;
 			});	
@@ -177,8 +182,8 @@ class Spider {
 			author_div.children[1].querySelectorAll('a').forEach( a => {
 				authors.push( a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
     		})
-    		let author_union = new Set([...authors, ...this.author_arr]);
-    		if( author_union.size === (authors.length + this.author_arr.length) ) {
+    		let intersect = authors.filter( author => this.author_arr.includes(author) );
+    		if( intersect.length == 0 ) {
     			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>被引</span>`;
 				other_cite_num += 1;
     		} else {
@@ -190,13 +195,13 @@ class Spider {
 	}
 
 	async get_detail_data(id) {
-		console.log(id + 1 + ' : 正在获取详情页数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 正在获取详情页数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		this.search_states[id][2] = 1;
 		let detail_url = this.detail_url.replace('_qid_', this.search_qid_arr[id])
 			.replace('_title_', this.title_arr[id]);
 		let res = await axios.get(detail_url)
 			.catch( e => {
-				console.log(id + 1 + ' : 详情页-网络错误：' + e);
+				console.log((id + 1 + '').padEnd(3, ' ') + ' : 详情页-网络错误：' + e);
 				this.search_states[id][2] = -1;
 				return false;
 			});
@@ -208,16 +213,16 @@ class Spider {
 		} else {
 			this.search_states[id][2] = -1;
 		}
-		console.log(id + 1 + ' : 已经完成详情页处理' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 已经完成详情页处理' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 	}
 
 	async get_journal_data(id) { 
-		console.log(id + 1 + ' : 正在获取期刊分区数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 正在获取期刊分区数据' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		this.search_states[id][3] = 1;
 		let journal_info_url = this.journal_info_url + this.journal_arr[id];
 		let res = await axios.get(journal_info_url)
 			.catch( e => {
-				console.log(id + 1 + ' : 期刊分区-网络错误：' + e);
+				console.log((id + 1 + '').padEnd(3, ' ') + ' : 期刊分区-网络错误：' + e);
 				this.search_states[id][3] = -1;
 				return false;
 			});
@@ -229,7 +234,7 @@ class Spider {
 		} else {
 			this.search_states[id][3] = -1;
 		}
-		console.log(id + 1 + ' : 已经完成期刊分区处理' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 已经完成期刊分区处理' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 	}
 
 	search_result_format(data) {
@@ -305,7 +310,7 @@ class Spider {
 	}
 
 	async crawl(id) {
-		console.log(id + 1 + ' : 开始运行' + new Date().getMinutes() + ':' + new Date().getSeconds() );
+		console.log((id + 1 + '').padEnd(3, ' ') + ' : 开始运行' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		await this.get_search_data(id);
 		if( this.search_states[id][0] == 2 && this.search_states[id][4] == 0 ) {
 			let res = await this.get_cite_data(id);
