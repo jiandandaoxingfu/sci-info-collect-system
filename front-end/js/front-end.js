@@ -3,6 +3,8 @@ class App {
 		this.is_start = false;
 		this.lastest_version = 'v1.0.0';
 		this.interval = null;
+		this.tic = 0;
+		this.toc = 0;
 
 		this.cite_tabs_id = [];
 		this.after_end_tab_id = 0;
@@ -177,6 +179,7 @@ class App {
 		this.is_start = false;
 		window.clearInterval(this.interval);
 		this.cite_tabs_id = [];
+		this.toc = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds();
 		setTimeout(() => {
 			chrome.tabs.update(this.after_end_tab_id, {active: true});
 		}, 1000);
@@ -226,6 +229,7 @@ document.addEventListener('click', (e) => {
 				alert('请重新启动或者等待任务完成');
 				return;
 			}
+			app.tic = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds();
 			if( app.input_valid_check() ) {
 				app.open_tab();
 			}
