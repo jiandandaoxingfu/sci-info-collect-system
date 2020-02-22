@@ -39,9 +39,10 @@ message.on('is-start', () => {
 	document.write(`
 		<div id='message'><br><br>
 			<div style="font-size: 40px; width: 100%; text-align: center;">
-				正在运行中，<span style="color: red;">请勿关闭</span>，其它运行中的窗口也不要关闭。<br>
+				正在运行中，<span style="color: red;">请勿关闭</span><br>
 				任务完成后，数据会显示在该页面，打印或导出为pdf即可<br><span style="font-size: 30px; color: red;">
 				使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br>
+				<button onclick="window.print();" class='btn btn-primary'>打印</button><br>
 			</div><br><br><br><br>
 		</div>`);
 	document.title = '结果显示页面';
@@ -58,7 +59,6 @@ message.on('render', msg => {
 })
 
 message.on('done', msg => {
-	document.body.removeChild( document.querySelector('#message') );
 	alert(`			任务已经完成，打印该页面或另存为pdf即可
 			     		 检索结果越多，打印速度越慢
 		`);

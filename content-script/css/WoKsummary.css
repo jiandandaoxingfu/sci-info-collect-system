@@ -20,4 +20,8 @@ span.cite-num {  font-weight: bolder; color: red; }
 	h2, .error {
 		display: none;
 	}
+
+	#message {
+		display: none;
+	}
 }

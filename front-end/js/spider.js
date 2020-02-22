@@ -44,10 +44,10 @@ class Spider {
 				if( records.length === 1 ) {
 					info = 'success';
 					
-					let content = body.querySelector('.search-results-content');
-					let authors = Array.from( content.children[1].querySelectorAll('a') )
-									   .map( a => a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
-    				this.author_order[id] = authors.indexOf(intersect[0]);
+					// let content = body.querySelector('.search-results-content');
+					// let authors = Array.from( content.children[1].querySelectorAll('a') )
+					// 				   .map( a => a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
+    	// 			this.author_order[id] = authors.indexOf(intersect[0]);
 
 					this.search_states[id][0] = 2;
 					let data = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];

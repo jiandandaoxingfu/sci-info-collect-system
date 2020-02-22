@@ -7,7 +7,20 @@
 }
 
 td:nth-child(2) {
-
 	text-align: left;
 	width: 300px !important;
+}
+
+@media print {
+	
+	#title, button, div.ant-input-number, header span, footer {
+		display: none !important;
+	}
+
+	#container {
+		overflow: visible;
+		display: block !important;		
+		position: absolute;
+		top: 100px;
+	}
 }
