@@ -182,6 +182,11 @@ class App {
 		this.toc = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds();
 		setTimeout(() => {
 			chrome.tabs.update(this.after_end_tab_id, {active: true});
+			alert(`
+					已完成
+				开始时间：${this.tic}
+				完成时间：${this.toc}
+				`)
 		}, 1000);
 	}
 
