@@ -235,16 +235,12 @@ document.addEventListener('click', (e) => {
 			}
 		} else if( action === "重新启动" ) {
 			if( app.is_start ) {
-				if( confirm('重启后，结果不会保存，是否确定重启？') ) {
+				if( confirm('任务未完成，重启后，结果不会保存，是否确定重启？') ) {
 					app.restart();
 				}
 			}
 		} else if( action === '打印表格' ) {
-			if( app.is_start ) {
-				alert('请等待任务完成');
-			} else {
-				window.print();
-			}
+			window.print();
 		}
 	}
 })
