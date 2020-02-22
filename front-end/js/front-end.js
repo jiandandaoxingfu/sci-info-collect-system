@@ -125,6 +125,9 @@ class App {
 						document.getElementById(state_key[i] + '-' + id).innerHTML = info;
 					} else if( s === 2 ) {
 						document.getElementById(state_key[i] + '-' + id).innerHTML = '<span style="color: blue;">完成</span>';
+						if( i === 0 ) {
+							document.getElementById('order-' + id).innerHTML = this.spider.author_order[id];
+						}
 					}
 				} else if( i === 1) {
 					if( s === 1 || s === -1 ) {
@@ -180,13 +183,13 @@ class App {
 		window.clearInterval(this.interval);
 		this.cite_tabs_id = [];
 		this.toc = new Date().getHours() + ':' + new Date().getMinutes() + ':' + new Date().getSeconds();
-		setTimeout(() => {
-			chrome.tabs.update(this.after_end_tab_id, {active: true});
-			alert(`
+		alert(`
 					已完成
 				开始时间：${this.tic}
 				完成时间：${this.toc}
-				`)
+		`)
+		setTimeout(() => {
+			chrome.tabs.update(this.after_end_tab_id, {active: true});
 		}, 1000);
 	}
 
@@ -218,6 +221,14 @@ class App {
 				this.start();
 			}
 		})
+	}
+
+	saveAsHTML() {
+		let a = document.createElement('a');
+		a.download = '搜索结果页面.html';
+		var b = new Blob([document.body.innerHTML]);
+        a.href =URL.createObjectURL(b);
+        a.click();
 	}
 }
 

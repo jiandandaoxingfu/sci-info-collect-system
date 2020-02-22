@@ -14,6 +14,7 @@ class Spider {
 		this.author_arr = author_arr;
 		this.year_arr = year_arr;
 		this.journal_arr = new Array(n).join(',').split(',');
+		this.author_order = new Array(n).join(',').split(',');
 		
 		this.search_datas = new Array(n).join(',').split(',');
 		this.cite_refine_datas = new Array(n).join(',').split(',');
@@ -43,14 +44,15 @@ class Spider {
 			if( records ) {
 				if( records.length === 1 ) {
 					info = 'success';
-					
-					// let content = body.querySelector('.search-results-content');
-					// let authors = Array.from( content.children[1].querySelectorAll('a') )
-					// 				   .map( a => a.innerHTML.replace(/(-|,|\s|\.)/g, '') );
-    	// 			this.author_order[id] = authors.indexOf(intersect[0]);
-
 					this.search_states[id][0] = 2;
 					let data = res.data.replace(/(\r\n|\r|\n)/g, '').match(/<div class="search-results">.*?name="LinksAreAllowedRightClick" value="CitedPatent\.do"/)[0];
+					let authors = data.match(/<div.*?span.*?作者.*?<\/div>/)[0].match(/<a.*?>.*?<\/a>/g)
+						.slice(1).map( a => a.match(/>(.*?)<\/a>/)[1].replace(/(-|,|\s|\.)/g, '') );
+					let intersect = this.author_arr.filter( author => authors.includes(author) );
+					console.log((id + 1 + '').padEnd(3, ' ') + ' : 搜索文章作者-' + authors.reduce( (i, j) => i + '--' + j ) );
+    				if( intersect.length === 1 ) {
+    					this.author_order[id] = authors.indexOf(intersect[0]) + 1;
+    				}
 					this.journal_arr[id] = data.match(/<value>(.*?)<\/value>/)[1];
 					this.search_datas[id] = this.search_result_format(data);
 					this.search_qid_arr[id] = res.data.match(/qid=(\d+)/)[1];
