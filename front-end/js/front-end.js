@@ -5,6 +5,7 @@ class App {
 		this.interval = null;
 		this.tic = 0;
 		this.toc = 0;
+		this.check_update_count = 0;
 
 		this.cite_tabs_id = [];
 		this.after_end_tab_id = 0;
@@ -22,6 +23,8 @@ class App {
 	}
 
 	check_update() {
+		if( this.check_update_count > 5 ) return;
+		this.check_update_count++;
 		let release_url = 'https://api.github.com/repos/jiandandaoxingfu/sci-info-collect-system/releases';
 		axios.get(release_url).then( (res) => {
 			if( res.data[0] ) {
@@ -232,11 +235,6 @@ class App {
 	}
 }
 
-var app = new App();
-app.check_update();
-app.create_table();
-app.message_handler();
-
 document.addEventListener('click', (e) => {
 	if( e.target.tagName.toLowerCase() === 'button' ) {
 		let action = e.target.innerText;
@@ -260,3 +258,8 @@ document.addEventListener('click', (e) => {
 		}
 	}
 })
+
+var app = new App();
+app.check_update();
+app.create_table();
+app.message_handler();
