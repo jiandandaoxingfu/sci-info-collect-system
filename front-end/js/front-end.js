@@ -158,7 +158,7 @@ class App {
 		this.is_start = true;
 		chrome.tabs.create({
 			active: false,
-			url: 'https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com'
+			url: 'https://apps.webofknowledge.com'
 		}, tab => {
 			this.after_end_tab_id = tab.id;
 			this.windowId = tab.windowId;

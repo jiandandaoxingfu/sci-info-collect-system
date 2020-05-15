@@ -14,7 +14,7 @@
   "description": "用于科研成果统计",
   "permissions": [
     "tabs",
-    "https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com/*",
+    "https://apps.webofknowledge.com/*",
     "http://www.fenqubiao.com/*",
     "https://api.github.com/repos/jiandandaoxingfu/sci-info-collect-system/releases"
   ],
@@ -35,7 +35,7 @@
 
   "content_scripts": [{
     // webofscience主窗口，负责打印。
-    "matches": ["https://vpn2.zzu.edu.cn/,DanaInfo=apps.webofknowledge.com+UA_GeneralSearch_input.do*"],
+    "matches": ["https://apps.webofknowledge.com/UA_GeneralSearch_input.do*"],
     "js": [
         "content-script/js/message.js",
         "content-script/js/after-end.js"],
