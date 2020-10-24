@@ -100,7 +100,7 @@ class Spider {
 		let record_num = data.match(/id="RECORD_\d+/g).length; // 0, <=10, <=25，<=50一旦有一次调整每页25个，接下来都是25个。
 		if( record_num > 0 ) {
 			// 判断引用文献中是否含有所需年份内发表的，如果有，计算出最大引用量：即所需最小年份以后的引用量,从而确定爬取页数。
-			let year_and_num = data.match(/\d{4}[^0-9]{1,10}\d+\)/g).map( yn => yn.match(/\d+/g) );
+			let year_and_num = data.match(/\d{4}.{0,3}\(.{0,8}\d+\)/g).map( yn => yn.match(/\d+/g) );
 			let year_arr = year_and_num.map( s => parseInt( s[0] ) );
 			let num_arr = year_and_num.map( s => parseInt( s[1] ));
 			let intersect = this.year_arr.filter( y => year_arr.includes(y) );
@@ -142,7 +142,7 @@ class Spider {
 
 	async next_cite_page(data, id) {
 		let next_page_url = data.match(/class="paginationNext.*?href="(.*?)"/)[1].replace(/amp;/g, '');
-		if( !next_page_url.includes('https://apps.webofknowledge.com/summary.do') ) {
+		if( !next_page_url.match(/https:\/\/apps\.webofknowledge\.com.*?\/summary.do/) ) {
 			this.search_states[id][1] = -1;
 			return ['', ''];
 		}
