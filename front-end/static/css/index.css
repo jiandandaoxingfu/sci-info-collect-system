@@ -13,7 +13,7 @@ td:nth-child(2) {
 
 @media print {
 	
-	#title, button, div.ant-input-number, header span, footer {
+	#title, button, div.ant-input-number, header span, footer, .action {
 		display: none !important;
 	}
 

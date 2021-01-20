@@ -17,9 +17,9 @@ class App {
 		this.author_arr = [];
 		this.year_arr = [];
 		this.threads = 3;
-		this.table_header = ['#', '标题', '检索页', '引用页', '引用量', '他引量', '自引量', '详情页', '期刊分区页', '作者顺序', '进度'];
+		this.table_header = ['#', '标题', '检索页', '引用页', '引用量', '他引量', '自引量', '详情页', '期刊分区页', '作者顺序', '进度', '功能'];
 		this.header_en = {'#': 'num', '标题': 'title', '检索页': 'search', '引用页': 'cite-refine', '引用量': 'cite-num', '他引量': 'other-cite-num', 
-			'自引量': 'self-cite-num', '详情页': 'detail', '期刊分区页': 'journal', '作者顺序': 'order', '进度': 'process'};
+			'自引量': 'self-cite-num', '详情页': 'detail', '期刊分区页': 'journal', '作者顺序': 'order', '进度': 'process', '功能': 'action'};
 	}
 
 	check_update() {
@@ -106,6 +106,14 @@ class App {
   									tr += `<td id="${this.header_en[h]}-${id}">${id + 1}</td>`;
   								} else if( i == 1 ) {
   									tr += `<td id="${this.header_en[h]}-${id}" title="${t}">${t.slice(0, 30)}... </td>`;
+  								} else if( i == this.table_header.length - 1 ) {
+  									tr += `<td id="${this.header_en[h]}-${id}">
+  												<span class="action">
+  													<a target="_blank" href="" id="search-url-${id}">搜索</a>
+  													<a target="_blank" href="" id="cite-url-${id}">引用</a>
+  													<a target="_blank" href="" id="detail-url-${id}">全纪录</a>
+												</span>
+											</td>`;
   								} else {
   									tr += `<td id="${this.header_en[h]}-${id}"></td>`;
   								}
@@ -121,6 +129,9 @@ class App {
 	update_render() {
 		this.spider.search_states.forEach((state, id) => {
 			let state_key = ['search', 'cite-refine', 'detail', 'journal', 'process'];
+			document.getElementById('search-url-' + id).href = this.spider.search_url_arr[id];
+			document.getElementById('cite-url-' + id).href = this.spider.cite_url_arr[id];
+			document.getElementById('detail-url-' + id).href = this.spider.detail_url_arr[id];
 			state.forEach( (s, i) => {
 				if( i !== 1 && i !== 4 ) {
 					if( s === 1 || s === -1 ) {

@@ -15,7 +15,11 @@ class Spider {
 		this.year_arr = year_arr;
 		this.journal_arr = new Array(n).join(',').split(',');
 		this.author_order = new Array(n).join(',').split(',');
-		
+
+		this.search_url_arr = new Array(n).join(',').split(',');
+		this.cite_url_arr = new Array(n).join(',').split(',');
+		this.detail_url_arr = new Array(n).join(',').split(',');
+
 		this.search_datas = new Array(n).join(',').split(',');
 		this.cite_refine_datas = new Array(n).join(',').split(',');
 		this.detail_tables = new Array(n).join(',').split(',');
@@ -38,6 +42,7 @@ class Spider {
 		console.log((id + 1 + '').padEnd(3, ' ') + ' : 正在搜索' + new Date().getMinutes() + ':' + new Date().getSeconds() );
 		this.search_states[id][0] = 1;
 		let search_url = this.search_url.replace('_title_', this.title_arr[id]);
+		this.search_url_arr[id] = search_url;
 		await axios.get(search_url).then( res => {
 			let records = res.data.match(/id="RECORD_\d+/g);
 			let info = '';
@@ -88,6 +93,7 @@ class Spider {
 		this.search_states[id][1] = 1;
 		let cite_url = this.cite_url.replace('_qid_', this.search_qid_arr[id])
 			.replace('_refid_', this.refid_arr[id]);
+		this.cite_url_arr[id] = cite_url;
 		let res = await axios.get(cite_url)
 			.catch( e => {
 				console.log((id + 1 + '').padEnd(3, ' ') + ' : 引用-网络错误：' + e);
@@ -201,6 +207,7 @@ class Spider {
 		this.search_states[id][2] = 1;
 		let detail_url = this.detail_url.replace('_qid_', this.search_qid_arr[id])
 			.replace('_title_', this.title_arr[id]);
+		this.detail_url_arr[id] = detail_url;
 		let res = await axios.get(detail_url)
 			.catch( e => {
 				console.log((id + 1 + '').padEnd(3, ' ') + ' : 详情页-网络错误：' + e);
@@ -277,16 +284,33 @@ class Spider {
 	detail_table_format(data) {
 		let body = document.createElement('div');
 		body.innerHTML = data;
-		data = body.querySelectorAll('table');
-		if( data[2] ) {
-			body.innerHTML = '';
-			body.appendChild(data[2]);
-			data[2].style.margin = '50px';
-			body.setAttribute('class', 'printWhitePage');
-			return body.innerHTML;
-		} else {
-			return '';
+		try {
+			let index = data.indexOf('Web of Science 类别');
+			index = data.slice(0, index).match(/<td/g).length;
+			body.getElementsByTagName('td')[index - 1].className = "research-subject";
+			body.getElementsByTagName('td')[index].className = "research-subject";
+	
+			index = data.indexOf('地址');
+			index = data.slice(0, index).match(/<td/g).length;
+			body.getElementsByTagName('td')[index - 1].className = "address";
+			body.getElementsByTagName('td')[index].className = "address";
+		} catch(e) {
+			
 		}
+		return body.innerHTML;
+
+		// let body = document.createElement('div');
+		// body.innerHTML = data;
+		// data = body.querySelectorAll('table');
+		// if( data[2] ) {
+		// 	body.innerHTML = '';
+		// 	body.appendChild(data[2]);
+		// 	data[2].style.margin = '50px';
+		// 	body.setAttribute('class', 'printWhitePage');
+		// 	return body.innerHTML;
+		// } else {
+		// 	return '';
+		// }
 	}
 
 	journal_table_format(data) {
@@ -377,19 +401,19 @@ class Spider {
 				div2 += `<h3>${id + 1} ： ${this.title_arr[id]}</h3>`;				
 				div2 += `<div class="cite_num_">总引用量：${ cite_num }</div>`;
 				div2 += this.cite_refine_datas[id];
-				div2 += '<div style="page-break-after: always;"></div>';
 			}
 		} else if( state[1] === -1 ){
 			div2 += '<div class="error">获取引用数据出错了。</div>';
 		}
+
+		let div3 = "";
 		if( state[2] === 2 ) {
-			div2 += this.detail_tables[id];
-			div2 += '<div style="page-break-after: always;"></div>';
+			div3 += this.detail_tables[id];
 		} else if( state[2] === -1 ) {
-			div2 += '<div class="error">获取详情页数据出错了。</div>';
+			div3 += '<div class="error">获取详情页数据出错了。</div>';
 		}
 
-		message.send(this.after_end_tad_id, 'render', {id: id, div1: div1, div2: div2});
+		message.send(this.after_end_tad_id, 'render', {id: id, div1: div1, div2: div2, div3: div3});
 	}
 
 	done() {
