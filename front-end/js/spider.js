@@ -283,6 +283,7 @@ class Spider {
 
 	detail_table_format(data) {
 		let body = document.createElement('div');
+		data = data.replace(/<button class="standard-button secondary-button".*?>关闭<\/button>/g, '');
 		body.innerHTML = data;
 		try {
 			let index = data.indexOf('Web of Science 类别');
