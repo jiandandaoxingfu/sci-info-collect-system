@@ -16,7 +16,10 @@
     "tabs",
     "https://apps.webofknowledge.com/*",
     "http://www.fenqubiao.com/*",
-    "https://api.github.com/repos/jiandandaoxingfu/sci-info-collect-system/releases"
+    "https://api.github.com/repos/jiandandaoxingfu/sci-info-collect-system/releases",
+    "https://xueshu.baidu.com/*",
+    "https://www.researchgate.net/*",
+    "https://www.sciencedirect.com/*"
   ],
 
   "browser_action": {
@@ -48,5 +51,14 @@
         "content-script/js/message.js",
         "content-script/js/fenqubiao.js"],
     "run_at": "document_start"
+    }, 
+    {
+    "matches": ["https://apps.webofknowledge.com/full_record.do*", 
+        "https://xueshu.baidu.com/*",
+        "https://www.researchgate.net/*",
+        "https://www.sciencedirect.com/*"],
+    "js": [
+        "content-script/js/open-in-sci-hub.js"],
+    "run_at": "document_end"
   }]
 }
