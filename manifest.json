@@ -1,7 +1,7 @@
 {
   "name": "科研成果统计",
   "manifest_version": 2,
-  "version": "2.0.0",
+  "version": "2.4.0",
   "author": "JMx",
   "homepage_url": "http://github.com/jiandandaoxingfu/sci-info-collect-system",
   "icons": {
@@ -51,14 +51,5 @@
         "content-script/js/message.js",
         "content-script/js/fenqubiao.js"],
     "run_at": "document_start"
-    }, 
-    {
-    "matches": ["https://apps.webofknowledge.com/full_record.do*", 
-        "https://xueshu.baidu.com/*",
-        "https://www.researchgate.net/*",
-        "https://www.sciencedirect.com/*"],
-    "js": [
-        "content-script/js/open-in-sci-hub.js"],
-    "run_at": "document_end"
-  }]
+    }]
 }

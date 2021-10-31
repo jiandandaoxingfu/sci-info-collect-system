@@ -22,21 +22,17 @@ function init(n) {
 		div.setAttribute('id', `div-${i}-part1`);
 		div.setAttribute('class', `part1`);
 		container.appendChild(div);
-	}
-	
-	container.innerHTML += '<div style="page-break-after: always;"></div>';
 
-	for( let i=0; i<n; i++ ) {
-		let div = document.createElement('div');
+		// container.innerHTML += '<div style="page-break-after: always;"></div>';
+
+		div = document.createElement('div');
 		div.setAttribute('id', `div-${i}-part2`);
 		div.setAttribute('class', `part2`);
 		container.appendChild(div);
-	}
+		
+		// container.innerHTML += '<div style="page-break-after: always;"></div>';
 
-	container.innerHTML += '<div style="page-break-after: always;"></div>';
-
-	for( let i=0; i<n; i++ ) {
-		let div = document.createElement('div');
+		div = document.createElement('div');
 		div.setAttribute('id', `div-${i}-part3`);
 		div.setAttribute('class', `part3`);
 		container.appendChild(div);
@@ -58,7 +54,12 @@ message.on('is-start', () => {
 				正在运行中，<span style="color: red;">请勿关闭</span><br>
 				任务完成后，数据会显示在该页面，导出pdf或导出html(网页)即可<br><span style="font-size: 30px; color: red;">
 				使用完成后，请将插件关闭，否则会影响Web of Science的正常使用。</span><br>
-				<button class='btn btn-primary' onclick="window.print();">导出为pdf文档</button>&nbsp;&nbsp;
+				<button class='btn btn-primary' onclick="
+					for( let part of document.getElementsByClassName('part2') ) if ( part.innerText == '' ) part.setAttribute('style', 'display: none; important;')
+					for( let part of document.getElementsByClassName('part3') ) if ( part.innerText == '' ) part.setAttribute('style', 'display: none; important;')
+					window.print();
+					">导出为pdf文档
+				</button>&nbsp;&nbsp;
 				<button class='btn btn-primary' onclick="(function saveAsHTML() {	
 						let a = document.createElement('a');	
 						a.download = '搜索结果页面.html';	
@@ -145,7 +146,7 @@ span.cite-num {  font-weight: bolder; color: red; }
 	#message {
 		display: none;
 	}
-	.part1, .part2 {
+	.part1 {
 		display: none;
 	}
 	.part1, .part2, .part3 {

@@ -1,7 +1,7 @@
 class App {
 	constructor() {
 		this.is_start = false;
-		this.lastest_version = 'v2.3.0';
+		this.lastest_version = 'v2.4.0';
 		this.interval = null;
 		this.tic = 0;
 		this.toc = 0;
@@ -46,7 +46,7 @@ class App {
 	}
 
 	input_valid_check() {
-		let title_arr = document.getElementById('title').value.replace(/(\r\n|\r|\n)/g, ' ').split('&&').map(d => d.replace(/(^\s*)/, ''));
+		let title_arr = document.getElementById('title').value.replace(/[{}\\"$]/g, '').replace(/(\r\n|\r|\n)/g, ' ').split('&&').map(d => d.replace(/(^\s*)/, ''));
 		let author = document.getElementById('author').value;
 		let threads = parseInt(document.getElementById('threads').value);
 		let year_arr = document.getElementById('year').value.replace(/，/g, ',').replace(/\s/g, '').split(',');

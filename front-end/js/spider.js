@@ -299,19 +299,6 @@ class Spider {
 			
 		}
 		return body.innerHTML;
-
-		// let body = document.createElement('div');
-		// body.innerHTML = data;
-		// data = body.querySelectorAll('table');
-		// if( data[2] ) {
-		// 	body.innerHTML = '';
-		// 	body.appendChild(data[2]);
-		// 	data[2].style.margin = '50px';
-		// 	body.setAttribute('class', 'printWhitePage');
-		// 	return body.innerHTML;
-		// } else {
-		// 	return '';
-		// }
 	}
 
 	journal_table_format(data) {
@@ -380,12 +367,11 @@ class Spider {
 	render(id) {
 		let state = this.search_states[id];
 		let div1 = '';
-		div1 += `<h3>${id + 1}</h3>`;
+		div1 += `<h2 style="background-color: yellow; border: 4px solid black; margin-top: 50px;">${id + 1}: ${this.title_arr[id]}</h2>`;
+		let cite_num = this.cite_num_arr[id][0] + this.cite_num_arr[id][1];
 		if( state[0] === 2 ) {
+			div1 += `<div class="cite_num_">总被引： ${cite_num}，&nbsp;&nbsp;&nbsp; 自引： ${this.cite_num_arr[id][1]}，&nbsp;&nbsp;&nbsp; 被引： ${this.cite_num_arr[id][0]}</div>`;
 			div1 += this.search_datas[id];
-			if( state[1] === 2 ) {
-				div1 += `<div class="cite_num_">自引：${this.cite_num_arr[id][1]}，&nbsp;&nbsp;&nbsp; 被引：${this.cite_num_arr[id][0]}</div>`;
-			}
 			if( state[3] === 2 ) {
 				div1 += this.journal_tables[id];
 			} else if( state[3] === -1 ) {
@@ -397,10 +383,10 @@ class Spider {
 
 		let div2 = '';
 		if( state[1] === 2 ) {
-			let cite_num = this.cite_num_arr[id][0] + this.cite_num_arr[id][1];
 			if( cite_num > 0 ) {
-				div2 += `<h3>${id + 1} ： ${this.title_arr[id]}</h3>`;				
-				div2 += `<div class="cite_num_">总引用量：${ cite_num }</div>`;
+				div2 += `<h3>${id + 1}: ${this.title_arr[id]}</h3>`;
+				div2 += `<div class="cite_num_">总被引： ${cite_num}，&nbsp;&nbsp;&nbsp; 自引： ${this.cite_num_arr[id][1]}，&nbsp;&nbsp;&nbsp; 被引： ${this.cite_num_arr[id][0]}</div>`;
+				div2 += `<div class="error">引用文献列表</div>`;
 				div2 += this.cite_refine_datas[id];
 			}
 		} else if( state[1] === -1 ){
@@ -409,6 +395,8 @@ class Spider {
 
 		let div3 = "";
 		if( state[2] === 2 ) {
+			div3 += `<h3>${id + 1}: ${this.title_arr[id]}</h3>`;
+			div3 += `<div class="error">详情页</div>`;
 			div3 += this.detail_tables[id];
 		} else if( state[2] === -1 ) {
 			div3 += '<div class="error">获取详情页数据出错了。</div>';
