@@ -36,26 +36,12 @@
     "president": false
   },
 
-  "content_scripts": [{
-    // webofscience主窗口，负责打印。
-    "matches": ["https://apps.webofknowledge.com/UA_GeneralSearch_input.do*"],
-    "js": [
-        "content-script/js/message.js",
-        "content-script/js/after-end.js"],
-    "run_at": "document_start"
-    }, 
+  "content_scripts": [
     {
-    "matches": ["https://apps.webofknowledge.com/OutboundService*", "https://apps.webofknowledge.com/Search.do*CitingArticles*", "https://apps.webofknowledge.com/summary.do*CitingArticles*"],
+    "matches": ["https://www.webofscience.com/wos/woscc/full-record/*",
+                "https://www.webofscience.com/wos/woscc/summary/*"],
     "js": [
         "content-script/js/highlight.js"],
-    "run_at": "document_start"
-    }, 
-    // 期刊分区详情页面
-    {
-    "matches": ["http://www.fenqubiao.com/"],
-    "js": [
-        "content-script/js/message.js",
-        "content-script/js/fenqubiao.js"],
     "run_at": "document_start"
     }]
 }

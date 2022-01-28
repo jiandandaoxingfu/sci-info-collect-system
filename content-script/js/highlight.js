@@ -1,28 +1,15 @@
 css = `
-.title, .author, .research-subject, .address { 
-	border: 5px solid black;
-}
-
-.footer {
-	display: none;
-}
 #tips {
 	position: fixed;
-	left: 5px;
-	top: 45%;
+	left: 25px;
+	top: 390px;
+	color: red;
+	font-size: 15px;
 }
 #tips input {
-	font-size: 30px; 
+	font-size: 20px; 
 	color: red; 
 	text-align: center;
-}
-.cite-num, cite_num_ {
-	font-size: 25px !important; 
-	color: red !important; 
-	display: inline-block !important;
-	border: 2px solid red;
-	text-align: center; 
-	margin-bottom: 20px;
 }
 #cite-number {
 	font-size:25px;
@@ -55,11 +42,33 @@ css = `
 	font-size: 25px;
 }
 input[type="checkbox"]:checked + span {
-	border: 2px solid blue;
+	border: 3px solid blue;
 	opacity: 1 !important;
 }
-.block-text-content, #PublicationYear_tr .refine-subitem {
+.block-text-content, 
+#PublicationYear_tr .refine-subitem, 
+#FullRTa-fullRecordtitle-0, 
+.highlight, 
+#SumAuthTa-MainDiv-author-en,
+#address_1,
+.journal-content-row,
+.search-info-title,
+.refine-term,
+.article-metadata {
 	border: 3px solid red;
+}
+
+#FRMiniCrlTa-snMcrl,
+.catg-classification-section,
+.funding-info-section,
+#snJournalData,
+footer {
+	display: none;
+}
+
+#snCitationData {
+	height: 750px;
+    overflow: hidden;
 }
 
 @media print {
@@ -82,59 +91,62 @@ interval = setInterval(() => {
 		style.innerHTML = css;
 		document.body.appendChild(style);
 
-		if (window.location.href.indexOf('OutboundService') > 0) {
-			let tags =
-				[
-					["Web of Science 类别", "research-subject"],
-					["地址", "address"],
-					["标题", "title"],
-					["作者", "author"]
-				]
-			for (let tag of tags) {
-				let index = document.body.innerHTML.indexOf(tag[0]);
-				index = document.body.innerHTML.slice(0, index).match(/<td/g).length;
-				document.body.getElementsByTagName('td')[index - 1].className = tag[1];
-				document.body.getElementsByTagName('td')[index].className = tag[1];
+		let script = document.createElement('script');
+		script.innerHTML = `
+			let clickable = true;
+			function add_mark() {
+				for (let td of document.getElementsByClassName('wos-jcr-overlay-panel ng-star-inserted')[0].getElementsByTagName('TD') ) {
+    				for (let div of td.getElementsByTagName('DIV') ) {
+        				if (div.innerHTML.toLowerCase().indexOf("mathematics") > -1 ) div.classList.add("highlight")
+    				}
+				}
+				window.print();
 			}
-		} else if (window.location.href.match(/(Search|summary)\.do.*?search_mode=CitingArticles/)) {
-			let script = document.createElement('script');
-			script.innerHTML = `
-				function checkbox_click(cb) {
-					if (cb.checked) {
-						document.querySelector('#self-cite').value = parseInt(document.querySelector('#self-cite').value) + 1;
-						document.querySelector('#other-cite').value = parseInt(document.querySelector('#other-cite').value) - 1;
-					} else {
+			document.addEventListener('click', e => {
+				setTimeout( () => {
+					clickable = !clickable;
+				}, 30)
+				if (!clickable) return;
+				clickable = !clickable;
+				if (e.target.tagName === "BUTTON") {
+					if (e.target.getAttribute('cdxanalyticscategory') === "wos-recordCard_Journal_Info") {
+						setTimeout( add_mark, 300);
+					}
+				} else if (e.target.className === "mat-checkbox-inner-container") {
+					let cb = e.target.querySelector(".mat-checkbox-input");
+					if (!cb.checked) {
 						document.querySelector('#self-cite').value = parseInt(document.querySelector('#self-cite').value) - 1;
 						document.querySelector('#other-cite').value = parseInt(document.querySelector('#other-cite').value) + 1;
+					} else {
+						document.querySelector('#self-cite').value = parseInt(document.querySelector('#self-cite').value) + 1;
+						document.querySelector('#other-cite').value = parseInt(document.querySelector('#other-cite').value) - 1;
 					}
 				}
-				function add_cite_btn() {
-					let items = document.body.getElementsByClassName('search-results-checkbox');
-					for (let item of items) {
-						item.innerHTML = '<input type="checkbox" class="cite-box" onclick="checkbox_click(this)"><span>自引</span>'
-					}
-				}
-			`
-			document.body.appendChild(script);
+			})
+		`
+		document.body.appendChild(script);
 
-			let tips = document.createElement('div');
-			tips.innerHTML = `
-				<div id='tips'>
-					<input type="button" value="开始标记是否自引" onclick="add_cite_btn()"/>
-				</div>`
-			document.body.appendChild(tips);
-
-			document.querySelector('.l-columns-item').innerHTML =`
+		if (window.location.href.indexOf("wos/woscc/summary/") > 0) {
+			(document.querySelector('.l-columns-item') || document.querySelector('.page-bar') ).innerHTML =`
 				<div id="cite-number">
+					<span style="color: blue;">绿色框</span>表示他引。
 					自引：<input id="self-cite" type="number" />
 					他引：<input id="other-cite" type="number" />
 				</div>
 			`
-			let other_cite = document.body.innerHTML.match(/PublicationYear_\d+.*?>(.*?)</)[1].split('(')[1].match(/\d+/)[0];
-			document.getElementById('other-cite').value = other_cite;
-			document.getElementById('self-cite').value = 0;
+			let self_cite = document.querySelector("[data-ta='filter-section-PY']").innerText.match(/\d+/g)[1];
+			document.getElementById('self-cite').value = self_cite;
+			document.getElementById('other-cite').value = 0;
+		} else if (window.location.href.indexOf("full-record") > 0 ) {
+			let tips = document.createElement('div');
+				tips.innerHTML = `
+					<div id='tips'>
+						点击期刊详情<br>
+						对数学分类进行标注
+						===>
+					</div>`
+				document.body.appendChild(tips);
 		}
-
 		clearInterval(interval);
-	}
+	} 
 }, 1000)
