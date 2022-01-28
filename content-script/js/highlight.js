@@ -93,34 +93,38 @@ interval = setInterval(() => {
 
 		let script = document.createElement('script');
 		script.innerHTML = `
-			let clickable = true;
 			function add_mark() {
+				count = 0;
 				for (let td of document.getElementsByClassName('wos-jcr-overlay-panel ng-star-inserted')[0].getElementsByTagName('TD') ) {
     				for (let div of td.getElementsByTagName('DIV') ) {
-        				if (div.innerHTML.toLowerCase().indexOf("mathematics") > -1 ) div.classList.add("highlight")
+        				if (div.innerHTML.toLowerCase().indexOf("mathematics") > -1 ) { 
+        					count += 1;
+        					div.classList.add("highlight") 
+        				}
     				}
 				}
-				window.print();
+				
+				let addr = document.querySelector("#address_1").innerText.indexOf("Zhengzhou Univ") > -1
+
+				if (count > 0 && addr) {
+					window.print();
+				} else {
+					alert("第一作者单位不是郑州大学或者杂志学科分类没有数学");
+				}
 			}
 			document.addEventListener('click', e => {
-				setTimeout( () => {
-					clickable = !clickable;
-				}, 30)
-				if (!clickable) return;
-				clickable = !clickable;
 				if (e.target.tagName === "BUTTON") {
 					if (e.target.getAttribute('cdxanalyticscategory') === "wos-recordCard_Journal_Info") {
 						setTimeout( add_mark, 300);
 					}
 				} else if (e.target.className === "mat-checkbox-inner-container") {
-					let cb = e.target.querySelector(".mat-checkbox-input");
-					if (!cb.checked) {
-						document.querySelector('#self-cite').value = parseInt(document.querySelector('#self-cite').value) - 1;
-						document.querySelector('#other-cite').value = parseInt(document.querySelector('#other-cite').value) + 1;
-					} else {
-						document.querySelector('#self-cite').value = parseInt(document.querySelector('#self-cite').value) + 1;
-						document.querySelector('#other-cite').value = parseInt(document.querySelector('#other-cite').value) - 1;
-					}
+					setTimeout( () => {
+						let other_cite = 0;
+						document.querySelector('.app-records-list').querySelectorAll('input').forEach( (input) => {
+							other_cite += input.checked + 0;
+						})
+						document.querySelector('#other-cite').value = other_cite;
+					}, 100)
 				}
 			})
 		`
@@ -130,12 +134,9 @@ interval = setInterval(() => {
 			(document.querySelector('.l-columns-item') || document.querySelector('.page-bar') ).innerHTML =`
 				<div id="cite-number">
 					<span style="color: blue;">绿色框</span>表示他引。
-					自引：<input id="self-cite" type="number" />
 					他引：<input id="other-cite" type="number" />
 				</div>
 			`
-			let self_cite = document.querySelector("[data-ta='filter-section-PY']").innerText.match(/\d+/g)[1];
-			document.getElementById('self-cite').value = self_cite;
 			document.getElementById('other-cite').value = 0;
 		} else if (window.location.href.indexOf("full-record") > 0 ) {
 			let tips = document.createElement('div');
