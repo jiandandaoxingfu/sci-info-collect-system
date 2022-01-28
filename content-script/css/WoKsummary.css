@@ -9,9 +9,10 @@ span.cite-num {  font-weight: bolder; color: red; }
 	text-align: center;
 }
 
-.cite_num_ {
-	font-size: 20px; 
-	color: red; 
+.cite-num {
+	font-size: 25px; 
+	color: white; 
+	background-color: red;
 	text-align: center; 
 	margin-bottom: 20px;
 }

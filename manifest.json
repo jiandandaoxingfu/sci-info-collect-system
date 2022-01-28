@@ -44,6 +44,12 @@
         "content-script/js/after-end.js"],
     "run_at": "document_start"
     }, 
+    {
+    "matches": ["https://apps.webofknowledge.com/OutboundService*", "https://apps.webofknowledge.com/Search.do*CitingArticles*", "https://apps.webofknowledge.com/summary.do*CitingArticles*"],
+    "js": [
+        "content-script/js/highlight.js"],
+    "run_at": "document_start"
+    }, 
     // 期刊分区详情页面
     {
     "matches": ["http://www.fenqubiao.com/"],

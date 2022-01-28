@@ -12,7 +12,7 @@ function init(n) {
 	let style = document.createElement('style');
 	style.innerHTML = css;
 	document.body.appendChild(style);
-
+	
 	let container = document.createElement('div');
 	container.setAttribute('id', 'container');
 	document.body.appendChild(container);
@@ -89,8 +89,7 @@ message.on('done', msg => {
 		`);
 })
 
-
-var css = `
+let css = `
 /*!
  * Bootstrap v2.3.2
  */
@@ -121,7 +120,8 @@ span.cite-num {  font-weight: bolder; color: red; }
 	page-break-after: always;
 }
 
-.research-subject, .address { 
+
+.title, .author, .research-subject, .address { 
 	border: 5px solid black;
 }
 
@@ -133,9 +133,11 @@ span.cite-num {  font-weight: bolder; color: red; }
 	color: red; 
 	text-align: center;
 }
-.cite_num_ {
-	font-size: 20px; 
-	color: red; 
+.cite-num, cite_num_ {
+	font-size: 25px !important; 
+	color: red !important; 
+	display: inline-block !important;
+	border: 2px solid red;
 	text-align: center; 
 	margin-bottom: 20px;
 }

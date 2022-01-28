@@ -192,7 +192,7 @@ class Spider {
     		})
     		let intersect = authors.filter( author => this.author_arr.includes(author) );
     		if( intersect.length == 0 ) {
-    			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>被引</span>`;
+    			// author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>被引</span>`;
 				other_cite_num += 1;
     		} else {
     			author_div.nextElementSibling.firstElementChild.innerHTML += `<br><span class='cite-num'>自引</span>`;
@@ -286,15 +286,19 @@ class Spider {
 		data = data.replace(/<button class="standard-button secondary-button".*?>关闭<\/button>/g, '');
 		body.innerHTML = data;
 		try {
-			let index = data.indexOf('Web of Science 类别');
-			index = data.slice(0, index).match(/<td/g).length;
-			body.getElementsByTagName('td')[index - 1].className = "research-subject";
-			body.getElementsByTagName('td')[index].className = "research-subject";
-	
-			index = data.indexOf('地址');
-			index = data.slice(0, index).match(/<td/g).length;
-			body.getElementsByTagName('td')[index - 1].className = "address";
-			body.getElementsByTagName('td')[index].className = "address";
+			let tags = 
+				[
+					["Web of Science 类别", "research-subject"], 
+					["地址", "address"],
+					["标题", "title"],
+					["作者", "author"]
+				]
+			for (let tag of tags) {
+				let index = data.indexOf(tag[0]);
+				index = data.slice(0, index).match(/<td/g).length;
+				body.getElementsByTagName('td')[index - 1].className = tag[1];
+				body.getElementsByTagName('td')[index].className = tag[1];
+			}
 		} catch(e) {
 			
 		}
