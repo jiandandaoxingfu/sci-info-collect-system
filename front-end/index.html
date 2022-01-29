@@ -8,10 +8,17 @@
 	
 		<link rel="icon" href="./favicon.ico"/>
 		<style>
+			* {
+				font-family: kaiti, fangsong;
+			}
 			#root {
 				position: relative;
-				left: 100px;
+				left: 10px;
 				font-size: 25px;
+			}
+			img {
+				width: 600px; 
+				border: 1px solid black;
 			}
 		</style>
 
@@ -20,7 +27,7 @@
 	</head>
 	<body>
 		<div id="root">
-			<h2>科研成果需要做以下事情</h2>
+			<h2>科研成果需要统计以下信息</h2>
 			根据论文题目，
 			<ul>
 				<li>获取论文首页(必须是正式出版的版本)，命名为"#-1"</li>
@@ -52,36 +59,44 @@
 				<li>第一作者单位不是郑大， 特定年份无引用， 或者期刊学科分类没有数学的不需要统计</li>
 				<li>自引指本论文所有作者中的任意一个引用这一篇论文</li>
 				<li>论文首页必须是正式出版的， 有标题， 摘要， 作者信息， 期刊信息等。</li>
-				<li>文件命名要清楚， 比如第25个文章， 它的三个文件: 论文首页， 论文详情页， 论文引用页分别保存为25-1.pdf, 25-2.pdf, 25-3.pdf</li>
+				<li>文件命名要清楚， 比如第25个文章， 它的三个文件: 论文首页， 论文详情页， 论文引用页分别保存为25-1.pdf, 25-2.pdf, 25-3.pdf， 这样方便后续合并。</li>
+				<li>正经浏览器按Ctrl+P即可调出浏览器自带打印设置， 选择另存为PDF即可导出pdf。</li>
 
 			</ul>
 
 			<h2>插件功能</h2>
-			本插件的可以帮助对论文详情页面和论文被引用文献页面进行标记及统计
+			本插件的可以辅助对论文详情页面和论文被引用文献页面进行标记及统计
 			<h4>注意事项</h4>
 			<ul style="color: red;">
 				<li>因为只在Edge浏览器测试， 因此推荐使用Edge浏览器。</li>
-				<li>详情页面如果没有自动生成红色标注， 刷新一下即可。 此外， 需要点击作者下面的期刊， 然后自动标注数学分类并自动导出pdf。</li>
+				<li>详情页面如果没有自动生成红色标注， 刷新一下即可。 此外， 需要点击作者下面的期刊， 之后插件会自动标注数学分类并自动导出pdf。</li>
 				<li>引用页面如果没有自动生成红色标注， 刷新一下即可。 此外， 需要点击是否被引用， 之后导出pdf即可。</li>
 				<li>引用页面如果文献数多于10个的， 选择下方的每页显示50条。 多于50条的， 需要保存多个文件</li>
+				<li>不使用时， 需要把插件关闭， 否则会影响WOS的正常使用。</li>
 			</ul>
 
 			示例
 			<ul>
 				<li>
-					<img src="合并后文件名.pdf-0.png" style="width: 700px;" alt="">
+					<h4>论文首页</h4>
+					<img src="1-1.png" alt="">
 				</li>
 				<li>
-					<img src="合并后文件名.pdf-1.png" style="width: 700px;" alt="">
+					<h4>论文详情页面</h4>
+					<img src="合并后文件名.pdf-0.png" alt="">
+					<img src="合并后文件名.pdf-1.png" alt="">
+				</li>
+				<li><h4>论文引用页面</h4>
+					<img src="合并后文件名.pdf-2.png" alt="">
+					<img src="合并后文件名.pdf-3.png" alt="">
+					<img src="合并后文件名.pdf-4.png" alt="">
 				</li>
 				<li>
-					<img src="合并后文件名.pdf-2.png" style="width: 700px;" alt="">
+					<h4>汇总</h4>
+					<img src="word.png" alt="">
 				</li>
 				<li>
-					<img src="合并后文件名.pdf-3.png" style="width: 700px;" alt="">
-				</li>
-				<li>
-					<img src="合并后文件名.pdf-4.png" style="width: 700px;" alt="">
+					最终将汇总导出为pdf， 放在首页， 和证明材料(论文首页， 详情页， 引用也)按照顺序合并成一个pdf文件即可。
 				</li>
 			</ul>
 
