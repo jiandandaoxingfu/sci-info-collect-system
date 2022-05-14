@@ -1,4 +1,76 @@
-css = `
+let interval = setInterval(() => {
+	if( !document.getElementById('my-style') ) {
+		let style = document.createElement('style');
+		style.innerHTML = css;
+		style.setAttribute('id', 'my-style');
+		document.body.appendChild(style);
+	}
+
+	if ( window.location.href.includes("wos/woscc/summary/") && !document.getElementById('cite-number') ) {
+		let ele = document.querySelector('.app-records-list');
+		if ( ele ) {
+			let div = document.createElement('div');
+			div.innerHTML = `
+			<div id="cite-number">
+				点击选择框来标注自引他引.<span style="color: blue;">绿色框</span>表示他引。
+				他引：<input id="other-cite" type="number" value="0" />
+			</div>`
+			ele.insertBefore(div, ele.firstChild);
+		}
+	}
+}, 3000)
+
+let journal_interval = setInterval(() => {
+	if ( window.location.href.includes('full-record') 
+		&& document.querySelector('[cdxanalyticscategory="wos-recordCard_Journal_Info"]') 
+		&& !document.querySelector('.wos-jcr-overlay-panel.ng-star-inserted') 
+	) {
+		document.querySelector('[cdxanalyticscategory="wos-recordCard_Journal_Info"]').click();
+	}
+}, 3000)
+
+function add_mark() {
+	let count = 0;
+	for (let td of document.querySelector('.wos-jcr-overlay-panel.ng-star-inserted')?.querySelectorAll?.('td') ?? [] ) {
+		for (let div of td.querySelectorAll('div')) {
+			if (div.innerHTML.toLowerCase().indexOf("mathematic") > -1) {
+				count += 1;
+				div.classList.add("highlight")
+			}
+		}
+	}
+
+	let addr = document.querySelector("#address_1").innerText.includes("Zhengzhou Univ");
+
+	if (count > 0 && addr) {
+		document.getElementById('full-record-info')?.remove?.();
+		window.print();
+	} else {
+		if( document.getElementById('full-record-info') ) return;
+		let div = document.createElement('div');
+		div.setAttribute('id', 'full-record-info');
+		div.style = "color: red; font-size: 25px;";
+		div.innerText = "第一作者单位不是郑州大学或者杂志学科分类没有数学";
+		let record = document.querySelector('.fullRecord-page');
+		record.insertBefore(div, record.firstChild);
+	}
+}
+
+document.addEventListener('click', e => {
+	if (e.target.getAttribute('cdxanalyticscategory') === "wos-recordCard_Journal_Info") {
+		setTimeout(add_mark, 1000);
+	} else if (e.target.className === "mat-checkbox-inner-container") {
+		setTimeout(() => {
+			let other_cite = 0;
+			document.querySelector('.app-records-list').querySelectorAll('input').forEach((input) => {
+				other_cite += input.checked + 0;
+			})
+			document.querySelector('#other-cite').value = other_cite;
+		}, 250)
+	}
+})
+
+const css = `
 #tips {
 	position: fixed;
 	left: 25px;
@@ -42,7 +114,7 @@ css = `
 	font-size: 25px;
 }
 input[type="checkbox"]:checked + span {
-	border: 3px solid blue;
+	border: 10px solid black;
 	opacity: 1 !important;
 }
 .block-text-content, 
@@ -58,12 +130,21 @@ input[type="checkbox"]:checked + span {
 	border: 3px solid red;
 }
 
+.wos-jcr-overlay-panel.ng-star-inserted {
+	position: inherit !important;
+}
+
 #FRMiniCrlTa-snMcrl,
 .catg-classification-section,
 .funding-info-section,
 #snJournalData,
 footer {
 	display: none;
+}
+
+.wos-recordCard_Journal_Info {
+	color: red;
+	border: 2px solid red;
 }
 
 #snCitationData {
@@ -83,71 +164,3 @@ footer {
 	}
 }
 `
-
-interval = setInterval(() => {
-	if (document.body) {
-		// style
-		let style = document.createElement('style');
-		style.innerHTML = css;
-		document.body.appendChild(style);
-
-		let script = document.createElement('script');
-		script.innerHTML = `
-			function add_mark() {
-				count = 0;
-				for (let td of document.getElementsByClassName('wos-jcr-overlay-panel ng-star-inserted')[0].getElementsByTagName('TD') ) {
-    				for (let div of td.getElementsByTagName('DIV') ) {
-        				if (div.innerHTML.toLowerCase().indexOf("mathematics") > -1 ) { 
-        					count += 1;
-        					div.classList.add("highlight") 
-        				}
-    				}
-				}
-				
-				let addr = document.querySelector("#address_1").innerText.indexOf("Zhengzhou Univ") > -1
-
-				if (count > 0 && addr) {
-					window.print();
-				} else {
-					alert("第一作者单位不是郑州大学或者杂志学科分类没有数学");
-				}
-			}
-			document.addEventListener('click', e => {
-				if (e.target.tagName === "BUTTON") {
-					if (e.target.getAttribute('cdxanalyticscategory') === "wos-recordCard_Journal_Info") {
-						setTimeout( add_mark, 300);
-					}
-				} else if (e.target.className === "mat-checkbox-inner-container") {
-					setTimeout( () => {
-						let other_cite = 0;
-						document.querySelector('.app-records-list').querySelectorAll('input').forEach( (input) => {
-							other_cite += input.checked + 0;
-						})
-						document.querySelector('#other-cite').value = other_cite;
-					}, 100)
-				}
-			})
-		`
-		document.body.appendChild(script);
-
-		if (window.location.href.indexOf("wos/woscc/summary/") > 0) {
-			(document.querySelector('.l-columns-item') || document.querySelector('.page-bar') ).innerHTML =`
-				<div id="cite-number">
-					<span style="color: blue;">绿色框</span>表示他引。
-					他引：<input id="other-cite" type="number" />
-				</div>
-			`
-			document.getElementById('other-cite').value = 0;
-		} else if (window.location.href.indexOf("full-record") > 0 ) {
-			let tips = document.createElement('div');
-				tips.innerHTML = `
-					<div id='tips'>
-						点击期刊详情<br>
-						对数学分类进行标注
-						===>
-					</div>`
-				document.body.appendChild(tips);
-		}
-		clearInterval(interval);
-	} 
-}, 1000)

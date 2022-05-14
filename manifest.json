@@ -1,7 +1,7 @@
 {
   "name": "科研成果统计",
   "manifest_version": 2,
-  "version": "2.4.0",
+  "version": "2.5.0",
   "author": "JMx",
   "homepage_url": "http://github.com/jiandandaoxingfu/sci-info-collect-system",
   "icons": {
@@ -14,12 +14,8 @@
   "description": "用于科研成果统计",
   "permissions": [
     "tabs",
-    "https://apps.webofknowledge.com/*",
-    "http://www.fenqubiao.com/*",
-    "https://api.github.com/repos/jiandandaoxingfu/sci-info-collect-system/releases",
-    "https://xueshu.baidu.com/*",
-    "https://www.researchgate.net/*",
-    "https://www.sciencedirect.com/*"
+    "http://github.com/jiandandaoxingfu/sci-info-collect-system/*",
+    "https://www.webofscience.com/*"
   ],
 
   "browser_action": {
@@ -38,8 +34,9 @@
 
   "content_scripts": [
     {
-    "matches": ["https://www.webofscience.com/wos/woscc/full-record/*",
-                "https://www.webofscience.com/wos/woscc/summary/*"],
+    "matches": [
+        "https://www.webofscience.com/wos/woscc/*"
+    ],
     "js": [
         "content-script/js/highlight.js"],
     "run_at": "document_start"
