@@ -30,9 +30,9 @@
 	<body>
 		<div id="root">
 			<h2>科研成果需要统计以下信息</h2>
-			根据论文题目，
+			根据论文题目(注意去除特殊字符, 如薛定谔的名字)，
 			<ul>
-				<li>获取论文首页(必须是正式出版的版本)，命名为"#-1"</li>
+				<li>获取论文首页(必须是正式出版的版本, 一般由老师提供, 只需要将第一页提取)，命名为"#-1"</li>
 				<li>获取论文详情，并标注
 					<ul>
 						<li>标题</li>
@@ -42,9 +42,9 @@
 						<li>导出pdf文件，命名为"#-2"</li>
 					</ul>
 				</li>
-				<li>获取论文特定年份被引文献列表， 统计并标注
+				<li>获取论文指定年份被引文献列表， 统计并标注
 					<ul>
-						<li>特定年份</li>
+						<li>指定年份</li>
 						<li>总引用数</li>
 						<li>自引，他引数</li>
 						<li>标题</li>
@@ -57,14 +57,18 @@
 
 			<h4>注意事项</h4>
 			<ul style="color: red;">
-				<li>使用WOS搜索需要选择WOS核心集合</li>
-				<li>第一作者单位不是郑大， 特定年份无引用， 或者期刊学科分类没有数学的不需要统计</li>
+				<li>使用WOS搜索需要选择<a href="https://www.webofscience.com/wos/woscc/basic-search" target="_blank">WOS核心集合</a></li>
+				<li>第一作者单位不是郑大， 指定年份无引用， 或者期刊学科分类没有数学的不需要统计</li>
 				<li>自引指本论文所有作者中的任意一个引用这一篇论文</li>
 				<li>论文首页必须是正式出版的， 有标题， 摘要， 作者信息， 期刊信息等。</li>
 				<li>文件命名要清楚， 比如第25个文章， 它的三个文件: 论文首页， 论文详情页， 论文引用页分别保存为25-1.pdf, 25-2.pdf, 25-3.pdf， 这样方便后续合并。</li>
 				<li>正经浏览器按Ctrl+P即可调出浏览器自带打印设置， 选择另存为PDF即可导出pdf。</li>
 
 			</ul>
+
+			<br />
+			<hr/>
+			<br />
 
 			<h2>插件功能</h2>
 			<ul>
@@ -82,24 +86,29 @@
 				<li>不使用时，需要把插件关闭，否则会影响WOS的正常使用。</li>
 			</ul>
 
-			示例
+			<br />
+			<hr/>
+			<br />
+
+
+			<h2>示例</h2>
 			<ul>
 				<li>
 					<h4>论文首页</h4>
 					<img src="1-1.png" alt="">
 				</li>
 				<li>
-					<h4>论文详情页面</h4>
+					<h4>论文详情页面(此页面标记由插件自动完成)</h4>
 					<img src="合并后文件名.pdf-0.png" alt="">
 					<img src="合并后文件名.pdf-1.png" alt="">
 				</li>
-				<li><h4>论文引用页面</h4>
+				<li><h4>论文引用页面(此页面红色框由插件自动完成, 他引标记需要用户操作. 注意此页面是指定年份的引用数据)</h4>
 					<img src="合并后文件名.pdf-2.png" alt="">
 					<img src="合并后文件名.pdf-3.png" alt="">
 					<img src="合并后文件名.pdf-4.png" alt="">
 				</li>
 				<li>
-					<h4>汇总</h4>
+					<h4>Word信息汇总</h4>
 					<img src="word.png" alt="">
 				</li>
 				<li>
@@ -108,6 +117,16 @@
 			</ul>
 
 		</div>
+
+		<br />
+		<hr/>
+		<br />
+
+		<div style="text-align: center; font-size: 25px;bottom: 30px;">
+			科研成果统计插件 v3.2 ©2020-2022 Created by <a rel="noreferrer" target="_blank" href="https://github.com/jiandandaoxingfu/sci-info-collect-system">JMx</a>
+		</div>
+
+	    <br />
 
 	</body>
 </html>

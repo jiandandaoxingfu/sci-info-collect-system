@@ -12,13 +12,17 @@ let interval = setInterval(() => {
 			let div = document.createElement('div');
 			div.innerHTML = `
 			<div id="cite-number">
-				点击选择框来标注自引他引.<span style="color: blue;">绿色框</span>表示他引。
+			    <span style="color: red; font: bold;" class="info">注意筛选年份/被引用页面</span>
+			    <br>
+				<span style="color: red; font: bold;" class="info">勾选选择框来标注他引</span>
+			    <br>
+			    <span style="color: blue;">黑色</span>勾选框表示他引。
 				他引：<input id="other-cite" type="number" value="0" />
 			</div>`
 			ele.insertBefore(div, ele.firstChild);
 		}
 	}
-}, 3000)
+}, 1000)
 
 let journal_interval = setInterval(() => {
 	if ( window.location.href.includes('full-record') 
@@ -27,13 +31,13 @@ let journal_interval = setInterval(() => {
 	) {
 		document.querySelector('[cdxanalyticscategory="wos-recordCard_Journal_Info"]').click();
 	}
-}, 3000)
+}, 1000)
 
 function add_mark() {
 	let count = 0;
 	for (let td of document.querySelector('.wos-jcr-overlay-panel.ng-star-inserted')?.querySelectorAll?.('td') ?? [] ) {
 		for (let div of td.querySelectorAll('div')) {
-			if (div.innerHTML.toLowerCase().indexOf("mathematic") > -1) {
+			if (div.innerHTML.toLowerCase().indexOf("math") > -1) {
 				count += 1;
 				div.classList.add("highlight")
 			}
@@ -60,13 +64,13 @@ document.addEventListener('click', e => {
 	if (e.target.getAttribute('cdxanalyticscategory') === "wos-recordCard_Journal_Info") {
 		setTimeout(add_mark, 1000);
 	} else if (e.target.className === "mat-checkbox-inner-container") {
-		setTimeout(() => {
+		setInterval(() => {
 			let other_cite = 0;
 			document.querySelector('.app-records-list').querySelectorAll('input').forEach((input) => {
 				other_cite += input.checked + 0;
 			})
 			document.querySelector('#other-cite').value = other_cite;
-		}, 250)
+		}, 300)
 	}
 })
 
@@ -153,7 +157,7 @@ footer {
 }
 
 @media print {
-	#tips {
+	#tips, .info {
 		display: none;
 	}
 	input[type="checkbox"] {
